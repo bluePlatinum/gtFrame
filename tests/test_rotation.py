@@ -27,6 +27,47 @@ class TestRotation2d:
 
         assert rot._angle == angle
 
+    def test_apply_static(self):
+        """
+        Test the .apply method.
+
+        :return: None
+        """
+        angle_0 = math.pi / 2
+        rot_0 = Rotation2d(angle_0)
+        vector_0 = np.array([3, 2])
+        expected_0 = np.array([-2, 3])
+
+        angle_1 = math.pi
+        rot_1 = Rotation2d(angle_1)
+        vector_1 = np.array([1, 0])
+        expected_1 = np.array([-1, 0])
+
+        angle_2 = math.pi / 4
+        rot_2 = Rotation2d(angle_2)
+        vector_2 = np.array([5, 0])
+        expected_2 = np.array([(math.sqrt(2) / 2) * 5, (math.sqrt(2) / 2) * 5])
+
+        assert np.allclose(rot_0.apply(vector_0), expected_0, rtol=RTOL)
+        assert np.allclose(rot_1.apply(vector_1), expected_1, rtol=RTOL)
+        assert np.allclose(rot_2.apply(vector_2), expected_2, rtol=RTOL)
+
+    def test_apply_random(self):
+        """
+        Test .apply method with random values.
+
+        :return: None
+        """
+        angles = [random.random() for i in range(20)]
+
+        for angle in angles:
+            vector = np.random.random(2)
+            rot = Rotation2d(angle)
+
+            expected = rot.as_matrix() @ vector
+
+            assert np.allclose(rot.apply(vector), expected, rtol=RTOL)
+
     def test_as_degree_static(self):
         """
         Test .as_degree method with static values.
@@ -118,3 +159,20 @@ class TestRotation2d:
                                         [math.sin(angle), math.cos(angle)]])
             assert np.allclose(rot.as_matrix(), expected_matrix, rtol=RTOL)
 
+    def test_update(self):
+        """
+        Test the update method with random values.
+
+        :return: None
+        """
+        initial_angle = random.random()
+        angles = [random.random() for _ in range(20)]
+
+        rot = Rotation2d(initial_angle)
+
+        for angle in angles:
+            rot.update(angle)
+            expected_matrix = np.array([[math.cos(angle), - math.sin(angle)],
+                                        [math.sin(angle), math.cos(angle)]])
+            assert math.isclose(rot.as_rad(), angle, rel_tol=RTOL)
+            assert np.allclose(rot.as_matrix(), expected_matrix, rtol=RTOL)

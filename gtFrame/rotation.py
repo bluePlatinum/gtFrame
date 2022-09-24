@@ -21,6 +21,21 @@ class Rotation2d:
         Constructor method.
         """
         self._angle = angle
+        self._matrix = np.array([
+            [math.cos(self._angle), - math.sin(self._angle)],
+            [math.sin(self._angle), math.cos(self._angle)]])
+
+    def apply(self, vector):
+        """
+        Apply the rotation to a given 2d-vector.
+
+        :param vector: the vector as a numpy array
+        :type vector: np.ndarray
+        :return: the transformed vector as a numpy array
+        :rtype: np.ndarray
+        """
+        vector = vector.copy()
+        return self._matrix @ vector
 
     def as_degrees(self):
         """
@@ -47,6 +62,18 @@ class Rotation2d:
         :return: the rotation as a rotation matrix
         :rtype: numpy.ndarray
         """
-        matrix = np.array([[math.cos(self._angle), - math.sin(self._angle)],
-                           [math.sin(self._angle), math.cos(self._angle)]])
-        return matrix
+        return self._matrix
+
+    def update(self, angle):
+        """
+        Updates (changes) the rotation.
+
+        :param angle: the new desired angle expressed in radians
+        :type angle: float
+        :return: None
+        :rtype: None
+        """
+        self._angle = angle
+        self._matrix = np.array([
+            [math.cos(self._angle), - math.sin(self._angle)],
+            [math.sin(self._angle), math.cos(self._angle)]])
