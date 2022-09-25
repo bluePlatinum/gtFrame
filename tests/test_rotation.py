@@ -25,7 +25,12 @@ class TestRotation2d:
         angle = random.random() * (2 * math.pi)
         rot = Rotation2d(angle)
 
+        expected_matrix = np.array([
+            [math.cos(angle), - math.sin(angle)],
+            [math.sin(angle), math.cos(angle)]], dtype=np.float64)
+
         assert rot._angle == angle
+        assert np.allclose(rot._matrix, expected_matrix, rtol=RTOL)
 
     def test_apply_static(self):
         """
@@ -62,11 +67,14 @@ class TestRotation2d:
 
         for angle in angles:
             vector = np.random.random(2)
+            vector_copy = vector.copy()
             rot = Rotation2d(angle)
 
             expected = rot.as_matrix() @ vector
 
             assert np.allclose(rot.apply(vector), expected, rtol=RTOL)
+            # Check that vector hasn't changed.
+            assert np.all(vector == vector_copy)
 
     def test_as_degree_static(self):
         """

@@ -1,6 +1,12 @@
 """
 This module contains helper functions and classes to work with rotations.
 Mainly this is used for 2d-rotations as 3d-rotations are handled with scipy.
+
+---------------------
+This module contains:
+---------------------
+Classes:
+    * Rotation2d
 """
 
 import math
@@ -23,7 +29,7 @@ class Rotation2d:
         self._angle = angle
         self._matrix = np.array([
             [math.cos(self._angle), - math.sin(self._angle)],
-            [math.sin(self._angle), math.cos(self._angle)]])
+            [math.sin(self._angle), math.cos(self._angle)]], dtype=np.float64)
 
     def apply(self, vector):
         """
@@ -76,4 +82,4 @@ class Rotation2d:
         self._angle = angle
         self._matrix = np.array([
             [math.cos(self._angle), - math.sin(self._angle)],
-            [math.sin(self._angle), math.cos(self._angle)]])
+            [math.sin(self._angle), math.cos(self._angle)]], dtype=np.float64)
