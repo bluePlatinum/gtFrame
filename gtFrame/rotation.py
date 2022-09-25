@@ -70,6 +70,23 @@ class Rotation2d:
         """
         return self._matrix
 
+    def is_close(self, rotation, rtol=1e-09, atol=0.0):
+        """
+        Checks wether two :class:`gtFrame.rotation.Rotation2d` objects are
+        close.
+
+        :param rotation: the other rotation object
+        :type rotation: Rotation2d
+        :param rtol: relative tolerance
+        :type rtol: float
+        :param atol: absolute tolerance
+        :type atol: float
+        :return: Wether the two rotations are close.
+        :rtype: bool
+        """
+        return math.isclose(self._angle, rotation.as_rad(), rel_tol=rtol,
+                            abs_tol=atol)
+
     def update(self, angle):
         """
         Updates (changes) the rotation.

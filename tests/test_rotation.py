@@ -167,6 +167,27 @@ class TestRotation2d:
                                         [math.sin(angle), math.cos(angle)]])
             assert np.allclose(rot.as_matrix(), expected_matrix, rtol=RTOL)
 
+    def test_is_close(self):
+        """
+        Test the .is_close method of the :class:`gtFrame.rotation.Rotation2d`.
+
+        :return: None
+        """
+        tested_rtol = 1e-12
+
+        angle_0 = random.random()
+        angles_0 = [angle_0, angle_0]
+        rot_0_a = Rotation2d(angles_0[0])
+        rot_0_b = Rotation2d(angles_0[1])
+
+        angle_1 = random.random()
+        angles_1 = [angle_1, (tested_rtol * 1.1) * angle_1]
+        rot_1_a = Rotation2d(angles_1[0])
+        rot_1_b = Rotation2d(angles_1[1])
+
+        assert rot_0_a.is_close(rot_0_b, rtol=tested_rtol)
+        assert not rot_1_a.is_close(rot_1_b, rtol=tested_rtol)
+
     def test_update(self):
         """
         Test the update method with random values.
