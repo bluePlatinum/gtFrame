@@ -1,6 +1,12 @@
 """
 This module contains helper functions and classes to work with rotations.
 Mainly this is used for 2d-rotations as 3d-rotations are handled with scipy.
+
+---------------------
+This module contains:
+---------------------
+Classes:
+    * Rotation2d
 """
 
 import math
@@ -21,6 +27,21 @@ class Rotation2d:
         Constructor method.
         """
         self._angle = angle
+        self._matrix = np.array([
+            [math.cos(self._angle), - math.sin(self._angle)],
+            [math.sin(self._angle), math.cos(self._angle)]], dtype=np.float64)
+
+    def apply(self, vector):
+        """
+        Apply the rotation to a given 2d-vector.
+
+        :param vector: the vector as a numpy array
+        :type vector: np.ndarray
+        :return: the transformed vector as a numpy array
+        :rtype: np.ndarray
+        """
+        vector = vector.copy()
+        return self._matrix @ vector
 
     def as_degrees(self):
         """
@@ -47,6 +68,35 @@ class Rotation2d:
         :return: the rotation as a rotation matrix
         :rtype: numpy.ndarray
         """
-        matrix = np.array([[math.cos(self._angle), - math.sin(self._angle)],
-                           [math.sin(self._angle), math.cos(self._angle)]])
-        return matrix
+        return self._matrix
+
+    def is_close(self, rotation, rtol=1e-09, atol=0.0):
+        """
+        Checks wether two :class:`gtFrame.rotation.Rotation2d` objects are
+        close.
+
+        :param rotation: the other rotation object
+        :type rotation: Rotation2d
+        :param rtol: relative tolerance
+        :type rtol: float
+        :param atol: absolute tolerance
+        :type atol: float
+        :return: Wether the two rotations are close.
+        :rtype: bool
+        """
+        return math.isclose(self._angle, rotation.as_rad(), rel_tol=rtol,
+                            abs_tol=atol)
+
+    def update(self, angle):
+        """
+        Updates (changes) the rotation.
+
+        :param angle: the new desired angle expressed in radians
+        :type angle: float
+        :return: None
+        :rtype: None
+        """
+        self._angle = angle
+        self._matrix = np.array([
+            [math.cos(self._angle), - math.sin(self._angle)],
+            [math.sin(self._angle), math.cos(self._angle)]], dtype=np.float64)
