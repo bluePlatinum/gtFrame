@@ -10,6 +10,7 @@ Variables:
     * origin2d
 Classes:
     * RootFrame2d
+    * Frame2d
 
 """
 
@@ -60,6 +61,52 @@ class Frame2d:
         self.rotation = rotation
         self._parent = parent_frame
 
+    def find_transform_path(self, frame):
+        """
+        Finds the reference path from this frame of refernce to the given
+        frame of reference. This is mainly used for the .transform_from and
+        .transform_to methods.
+
+        :param frame: the destination frame of reference
+        :type frame: Frame2d
+        :return: the path as a list with the first step on [0] and the last at
+            [-1]
+        :rtype: list
+        """
+        # This is not the most algorithm, but I can't be bothered to implement
+        # a tree and a pathfinding algorithm. Someday I might eventually ...
+        # The algoritm can be improved by finding the duplicates in the path
+        # and removing them.
+
+        # this frame to the origin
+        self_to_origin = list()
+        current_frame = self
+
+        while current_frame != origin2d:
+
+            # check if desired frame is in the branch
+            if current_frame == frame:
+                return self_to_origin
+
+            self_to_origin.append((current_frame, "to"))
+            current_frame = current_frame.parent()
+
+        # destination frame to the origin
+        frame_to_origin = list()
+        current_frame = frame
+
+        while current_frame != origin2d:
+
+            # check if self frame is on the branch of frame
+            if current_frame == self:
+                return frame_to_origin[::-1]        # invert path to flip ends
+
+            frame_to_origin.append((current_frame, "from"))
+            current_frame = current_frame.parent()
+
+        path = self_to_origin + frame_to_origin[::-1]
+        return path
+
     def parent(self):
         """
         Returns the parent frame.
@@ -90,3 +137,17 @@ class Frame2d:
         """
         rotated_vector = self.rotation.apply(vector)
         return rotated_vector + self.position
+
+    def transform_from(self, frame, vector):
+        """
+        Transform a vector expressed in an arbitrary frame of reference into
+        this frame.
+
+        :param frame: the frame of reference, in which the vector is defined
+        :type frame: Frame2d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        pass

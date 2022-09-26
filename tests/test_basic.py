@@ -113,6 +113,47 @@ class TestFrame2d:
         with pytest.raises(ValueError):
             frame = Frame2d(position, rot)      # noqa: F841
 
+    def test_find_transform_path(self):
+        """
+        Test the .find_transform_path method with static values.
+
+        :return: None
+        """
+        position = np.array([0, 0], dtype=np.float64)
+        rot = Rotation2d(0)
+
+        frame1 = Frame2d(position, rot)
+        frame2 = Frame2d(position, rot, parent_frame=frame1)
+        frame3 = Frame2d(position, rot, parent_frame=frame2)
+        frame4 = Frame2d(position, rot)
+        frame5 = Frame2d(position, rot, parent_frame=frame4)
+        frame6 = Frame2d(position, rot, parent_frame=frame3)
+        frame7 = Frame2d(position, rot, parent_frame=frame2)
+
+        path0 = frame3.find_transform_path(frame1)
+        path1 = frame6.find_transform_path(frame5)
+        path2 = frame7.find_transform_path(frame6)
+        path3 = frame5.find_transform_path(frame1)
+        path4 = frame2.find_transform_path(frame6)
+        path5 = frame7.find_transform_path(origin2d)
+
+        expected0 = [(frame3, "to"), (frame2, "to")]
+        expected1 = [(frame6, "to"), (frame3, "to"), (frame2, "to"),
+                     (frame1, "to"), (frame4, "from"), (frame5, "from")]
+        expected2 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+                     (frame1, "from"), (frame2, "from"), (frame3, "from"),
+                     (frame6, "from")]
+        expected3 = [(frame5, "to"), (frame4, "to"), (frame1, "from")]
+        expected4 = [(frame3, "from"), (frame6, "from")]
+        expected5 = [(frame7, "to"), (frame2, "to"), (frame1, "to")]
+
+        assert path0 == expected0
+        assert path1 == expected1
+        assert path2 == expected2
+        assert path3 == expected3
+        assert path4 == expected4
+        assert path5 == expected5
+
     def test_parent(self, random_frame2d):
         """
         Test the .parent method.
