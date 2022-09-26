@@ -68,3 +68,25 @@ class Frame2d:
         :rtype: Frame2d
         """
         return self._parent
+
+    def transform_from_parent(self, vector):
+        """
+        Transform a vector, expressed in the parent frame, into this frame.
+
+        :param vector: vector expressed in parent frame
+        :type vector: np.ndarray
+        :return: the vector expressed in this frame of reference
+        :rtype: np.ndarray
+        """
+        relative_vector = vector - self.position
+        return self.rotation.apply_inverse(relative_vector)
+
+    def transform_to_parent(self, vector):
+        """
+        Return the given vector expressed in the parent frame of reference.
+
+        :return: the vector in the parent frame of reference
+        :rtype: np.ndarray
+        """
+        rotated_vector = self.rotation.apply(vector)
+        return rotated_vector + self.position

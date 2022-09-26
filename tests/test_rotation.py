@@ -76,6 +76,21 @@ class TestRotation2d:
             # Check that vector hasn't changed.
             assert np.all(vector == vector_copy)
 
+    def test_apply_inverse_random(self):
+        """
+        Test the .apply_inverse method with random values.
+
+        :return: None
+        """
+        vector = np.random.rand(2)
+        angle = random.random() * (2 * math.pi)
+        rot = Rotation2d(angle)
+
+        rotated_vector = rot.apply(vector)
+
+        assert np.allclose(rot.apply_inverse(rotated_vector), vector,
+                           rtol=RTOL)
+
     def test_as_degree_static(self):
         """
         Test .as_degree method with static values.
@@ -112,21 +127,34 @@ class TestRotation2d:
 
         assert all(checks)
 
-    def test_as_rad_static(self):
+    def test_as_inverse_static(self):
         """
-        Test .as_rad method with static values.
+        Test the .as_inverse method with static values.
 
         :return: None
         """
-        angles = [i for i in range(-20, 20)]
+        angle = math.pi / 4
+        expected_inverse = np.array([[0.70710678,  0.70710678],
+                                    [-0.70710678,  0.70710678]],
+                                    dtype=np.float64)
+        rot = Rotation2d(angle)
 
-        checks = []
+        assert np.allclose(rot.as_inverse(), expected_inverse, rtol=RTOL)
 
-        for angle in angles:
-            rot = Rotation2d(angle)
-            checks.append(rot.as_rad() == angle)
+    def test_as_inverse_random(self):
+        """
+        Test the .as_inverse method with random values.
 
-        assert all(checks)
+        :return: None
+        """
+        angle = random.random() * (2 * math.pi)
+        rot = Rotation2d(angle)
+        matrix = np.array([[math.cos(angle), - math.sin(angle)],
+                           [math.sin(angle), math.cos(angle)]],
+                          dtype=np.float64)
+        expected_inverse = np.linalg.inv(matrix)
+
+        assert np.allclose(rot.as_inverse(), expected_inverse, rtol=RTOL)
 
     def test_as_matrix_static(self):
         """
@@ -166,6 +194,22 @@ class TestRotation2d:
             expected_matrix = np.array([[math.cos(angle), - math.sin(angle)],
                                         [math.sin(angle), math.cos(angle)]])
             assert np.allclose(rot.as_matrix(), expected_matrix, rtol=RTOL)
+
+    def test_as_rad_static(self):
+        """
+        Test .as_rad method with static values.
+
+        :return: None
+        """
+        angles = [i for i in range(-20, 20)]
+
+        checks = []
+
+        for angle in angles:
+            rot = Rotation2d(angle)
+            checks.append(rot.as_rad() == angle)
+
+        assert all(checks)
 
     def test_is_close(self):
         """

@@ -125,3 +125,96 @@ class TestFrame2d:
         frame = Frame2d(position, rot, parent_frame=random_frame2d)
 
         assert frame.parent() == random_frame2d
+
+    def test_transform_from_parent_static(self):
+        """
+        Test the .transform_from_parent method with static values
+
+        :return: None
+        """
+        position = np.array([5, 1], dtype=np.float64)
+        angle = math.pi / 4
+        rotation = Rotation2d(angle)
+        frame = Frame2d(position, rotation)
+
+        vector = np.array([1, 2], dtype=np.float64)
+        expected_vector = np.array([-2.12132034, 3.53553391],
+                                   dtype=np.float64)
+
+        assert np.allclose(frame.transform_from_parent(vector),
+                           expected_vector, rtol=RTOL)
+
+    def test_transform_from_parent_random(self):
+        """
+        Test the .transform_from_parent method with random values.
+
+        :return: None
+        """
+        position = np.random.random(2)
+        angle = random.random() * (2 * math.pi)
+        rotation = Rotation2d(angle)
+        frame = Frame2d(position, rotation)
+
+        vector = np.random.random(2)
+
+        translated_vector = vector - position
+        expected_vector = rotation.apply_inverse(translated_vector)
+
+        assert np.allclose(frame.transform_from_parent(vector),
+                           expected_vector, rtol=RTOL)
+
+    def test_transform_to_parent_static(self):
+        """
+        Test the .transform_to_parent method with static values.
+
+        :return: None
+        """
+        position = np.array([3, 1], dtype=np.float64)
+        angle = - math.pi / 4
+        rotation = Rotation2d(angle)
+        frame = Frame2d(position, rotation)
+
+        vector = np.array([1, 2], dtype=np.float64)
+        expected_vector = np.array([5.12132034, 1.70710678], dtype=np.float64)
+
+        assert np.allclose(frame.transform_to_parent(vector),
+                           expected_vector, rtol=RTOL)
+
+    def test_transform_to_parent_random(self):
+        """
+        Test the .transform_to_parent method with random values.
+
+        :return: None
+        """
+        position = np.random.random(2)
+        angle = random.random() * (2 * math.pi)
+        rotation = Rotation2d(angle)
+        frame = Frame2d(position, rotation)
+
+        vector = np.random.random(2)
+
+        rotated_vector = rotation.apply(vector)
+        expected_vector = rotated_vector + position
+
+        assert np.allclose(frame.transform_to_parent(vector),
+                           expected_vector, rtol=RTOL)
+
+    def test_transform_reversible(self):
+        """
+        Test wether the .transform_from_parent and .transform_to_parent
+        methods are reversible.
+
+        :return: None
+        """
+        for _ in range(10):
+            position = np.random.random(2)
+            angle = random.random() * (2 * math.pi)
+            rotation = Rotation2d(angle)
+            frame = Frame2d(position, rotation)
+
+            vector = np.random.random(2)
+
+            intermediate_vector = frame.transform_from_parent(vector)
+
+            assert np.allclose(frame.transform_to_parent(intermediate_vector),
+                               vector, rtol=RTOL)

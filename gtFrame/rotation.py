@@ -43,6 +43,20 @@ class Rotation2d:
         vector = vector.copy()
         return self._matrix @ vector
 
+    def apply_inverse(self, vector):
+        """
+        Apply the inverse of the rotation. This reverts the rotation.
+        I.e. it reverts the :method:`.apply` method.
+
+        :param vector: the vector on which to apply the inverse rotation as a
+            numpy array
+        :type vector: np.ndarray
+        :return: the transformed vector as a numpy array
+        :rtype: np.ndarray
+        """
+        inverse = self.as_inverse()
+        return inverse @ vector
+
     def as_degrees(self):
         """
         Returns the rotation as an angle expressed in degrees.
@@ -52,14 +66,14 @@ class Rotation2d:
         """
         return math.degrees(self._angle)
 
-    def as_rad(self):
+    def as_inverse(self):
         """
-        Returns the rotation as an angle expressed in radians.
+        Returns the rotation as the inverse of the rotation matrix.
 
-        :return: the rotation as an angle expressed in radians
-        :rtype: float
+        :return: the inverse rotation matrix
+        :rtype: np.ndarray
         """
-        return self._angle
+        return np.linalg.inv(self._matrix)
 
     def as_matrix(self):
         """
@@ -69,6 +83,15 @@ class Rotation2d:
         :rtype: numpy.ndarray
         """
         return self._matrix
+
+    def as_rad(self):
+        """
+        Returns the rotation as an angle expressed in radians.
+
+        :return: the rotation as an angle expressed in radians
+        :rtype: float
+        """
+        return self._angle
 
     def is_close(self, rotation, rtol=1e-09, atol=0.0):
         """
