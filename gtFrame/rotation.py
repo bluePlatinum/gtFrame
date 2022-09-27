@@ -2,9 +2,9 @@
 This module contains helper functions and classes to work with rotations.
 Mainly this is used for 2d-rotations as 3d-rotations are handled with scipy.
 
----------------------
-This module contains:
----------------------
+---------------
+Module Contents
+---------------
 Classes:
     * Rotation2d
 """
@@ -46,7 +46,7 @@ class Rotation2d:
     def apply_inverse(self, vector):
         """
         Apply the inverse of the rotation. This reverts the rotation.
-        I.e. it reverts the :method:`.apply` method.
+        I.e. it reverts the :meth:`.apply` method.
 
         :param vector: the vector on which to apply the inverse rotation as a
             numpy array

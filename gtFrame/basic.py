@@ -3,9 +3,9 @@ The :mod:`gtFrame.basic` module implements basic Frames. These do
 not account for any dynamics and just convert a static position and rotation
 into another.
 
----------------------
-This module contains:
----------------------
+---------------
+Module Contents
+---------------
 Variables:
     * origin2d
 Classes:
@@ -178,7 +178,7 @@ class Frame2d:
         :param vector: the vector to be transformed
         :type vector: np.ndarray
         :param path: the path for the transformation, as returned by
-            :method:`gtFrame.basic.Frame2d.find_transform_path`
+            :meth:`gtFrame.basic.Frame2d.find_transform_path`
         :type path: list
         :return: the final vector after the transformations
         :rtype: np.ndarray
