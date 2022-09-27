@@ -31,6 +31,32 @@ def random_frame2d():
     return Frame2d(position, rotation)
 
 
+@pytest.fixture
+def frame2d_system():
+    """
+    Generate a system of frames (Frame2d).
+
+    :return: generated system of frames as a list
+    :rtype: list
+    """
+    system = list()
+    desired_parents = ["O", 0, 1, "O", 3, 2, 1]
+
+    for parent_idx in desired_parents:
+        position = np.random.random(2)
+        angle = random.random() * (2 * math.pi)
+        rotation = Rotation2d(angle)
+
+        if parent_idx == "O":
+            frame = Frame2d(position, rotation)
+        else:
+            frame = Frame2d(position, rotation,
+                            parent_frame=system[parent_idx])
+        system.append(frame)
+
+    return system
+
+
 class TestModule:
     """
     Test for module attributes and functions.
@@ -185,6 +211,10 @@ class TestFrame2d:
         assert np.allclose(frame.transform_from_parent(vector),
                            expected_vector, rtol=RTOL)
 
+        # Check that vector remains unchanged
+        assert np.allclose(vector, np.array([1, 2], dtype=np.float64),
+                           rtol=RTOL)
+
     def test_transform_from_parent_random(self):
         """
         Test the .transform_from_parent method with random values.
@@ -197,12 +227,16 @@ class TestFrame2d:
         frame = Frame2d(position, rotation)
 
         vector = np.random.random(2)
+        vector_copy = vector.copy()
 
         translated_vector = vector - position
         expected_vector = rotation.apply_inverse(translated_vector)
 
         assert np.allclose(frame.transform_from_parent(vector),
                            expected_vector, rtol=RTOL)
+
+        # Check that vector remains unchanged
+        assert np.allclose(vector, vector_copy, rtol=RTOL)
 
     def test_transform_to_parent_static(self):
         """
@@ -221,6 +255,10 @@ class TestFrame2d:
         assert np.allclose(frame.transform_to_parent(vector),
                            expected_vector, rtol=RTOL)
 
+        # Check that vector remains unchanged
+        assert np.allclose(vector, np.array([1, 2], dtype=np.float64),
+                           rtol=RTOL)
+
     def test_transform_to_parent_random(self):
         """
         Test the .transform_to_parent method with random values.
@@ -233,6 +271,7 @@ class TestFrame2d:
         frame = Frame2d(position, rotation)
 
         vector = np.random.random(2)
+        vector_copy = vector.copy()
 
         rotated_vector = rotation.apply(vector)
         expected_vector = rotated_vector + position
@@ -240,7 +279,10 @@ class TestFrame2d:
         assert np.allclose(frame.transform_to_parent(vector),
                            expected_vector, rtol=RTOL)
 
-    def test_transform_reversible(self):
+        # Check that vector remains unchanged
+        assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_parent_reversible(self):
         """
         Test wether the .transform_from_parent and .transform_to_parent
         methods are reversible.
@@ -259,3 +301,113 @@ class TestFrame2d:
 
             assert np.allclose(frame.transform_to_parent(intermediate_vector),
                                vector, rtol=RTOL)
+
+    def test_transform_from(self, frame2d_system):
+        """
+        Test the .transform_from method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = frame2d_system[random.randint(0, 6)]
+            destination = frame2d_system[random.randint(0, 6)]
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame2d.transform_via_path(vector, path)
+
+            assert np.allclose(destination.transform_from(source, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_to(self, frame2d_system):
+        """
+        Test the .transform_to method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = frame2d_system[random.randint(0, 6)]
+            destination = frame2d_system[random.randint(0, 6)]
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame2d.transform_via_path(vector, path)
+
+            assert np.allclose(source.transform_to(destination, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_reversible(self, frame2d_system):
+        """
+        Test wether the .transform_to and transform_from methods are
+        reversible.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            source = frame2d_system[random.randint(0, 6)]
+            destination = frame2d_system[random.randint(0, 6)]
+
+            interim = source.transform_to(destination, vector)
+            result = source.transform_from(destination, interim)
+
+            assert np.allclose(result, vector, rtol=RTOL)
+
+    def test_transform_via_path(self, frame2d_system):
+        """
+        Test the .transform_via_path static method with a static path but with
+        random orientations and vectors.
+
+        :return: None
+        """
+        # Frame assignments
+        frame1 = frame2d_system[0]
+        frame2 = frame2d_system[1]
+        frame3 = frame2d_system[2]
+        frame4 = frame2d_system[3]
+        frame5 = frame2d_system[4]
+        frame6 = frame2d_system[5]
+        frame7 = frame2d_system[6]
+
+        # Testcase 0 frame7 -> frame3
+        vector0 = np.random.random(2)
+        path0 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+                 (frame1, "from"), (frame2, "from"), (frame3, "from")]
+        intermediate0 = frame7.transform_to_parent(vector0)
+        expected0 = frame3.transform_from_parent(intermediate0)
+
+        # Testcase 1 frame6 -> frame1
+        vector1 = np.random.random(2)
+        path1 = [(frame6, "to"), (frame3, "to"), (frame2, "to")]
+        intermediate1 = frame6.transform_to_parent(vector1)
+        intermediate1 = frame3.transform_to_parent(intermediate1)
+        expected1 = frame2.transform_to_parent(intermediate1)
+
+        # Testcase 2 frame5 -> frame2
+        vector2 = np.random.random(2)
+        path2 = [(frame5, "to"), (frame4, "to"), (frame1, "from"),
+                 (frame2, "from")]
+        intermediate2 = frame5.transform_to_parent(vector2)
+        intermediate2 = frame4.transform_to_parent(intermediate2)
+        intermediate2 = frame1.transform_from_parent(intermediate2)
+        expected2 = frame2.transform_from_parent(intermediate2)
+
+        assert np.allclose(Frame2d.transform_via_path(vector0, path0),
+                           expected0, rtol=RTOL)
+        assert np.allclose(Frame2d.transform_via_path(vector1, path1),
+                           expected1, rtol=RTOL)
+        assert np.allclose(Frame2d.transform_via_path(vector2, path2),
+                           expected2, rtol=RTOL)

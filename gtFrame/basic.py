@@ -78,6 +78,7 @@ class Frame2d:
         # The algoritm can be improved by finding the duplicates in the path
         # and removing them.
 
+        # ------------------------
         # this frame to the origin
         self_to_origin = list()
         current_frame = self
@@ -91,6 +92,7 @@ class Frame2d:
             self_to_origin.append((current_frame, "to"))
             current_frame = current_frame.parent()
 
+        # -------------------------------
         # destination frame to the origin
         frame_to_origin = list()
         current_frame = frame
@@ -150,4 +152,44 @@ class Frame2d:
         :return: the transformed vector
         :rtype: np.ndarray
         """
-        pass
+        path = frame.find_transform_path(self)
+        return Frame2d.transform_via_path(vector, path)
+
+    def transform_to(self, frame, vector):
+        """
+        Transform a vector expressed in this frame of reference into a given
+        frame of reference.
+
+        :param frame: the frame to which to transform to
+        :type frame: Frame2d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        path = self.find_transform_path(frame)
+        return Frame2d.transform_via_path(vector, path)
+
+    @staticmethod
+    def transform_via_path(vector, path):
+        """
+        Transforms a vector according to a given transform path.
+
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :param path: the path for the transformation, as returned by
+            :method:`gtFrame.basic.Frame2d.find_transform_path`
+        :type path: list
+        :return: the final vector after the transformations
+        :rtype: np.ndarray
+        """
+        transformed = vector
+        for frame, method in path:
+            if method == "from":
+                transformed = frame.transform_from_parent(transformed)
+            elif method == "to":
+                transformed = frame.transform_to_parent(transformed)
+            else:
+                raise ValueError("The used method was neither 'to' nor 'from'."
+                                 " The path seems to be corrupted.")
+        return transformed
