@@ -1,2 +1,4 @@
+gtFrame
 numpy
 pytest
+scipy
