@@ -34,6 +34,24 @@ class RootFrame2d:
         self.position = np.array([0, 0], dtype=np.float64)
         self.rotation = gtFrame.rotation.Rotation2d(0)
 
+    def find_transform_path(self, frame):
+        """
+        Finds the transform path from this frame of reference to the given
+        frame.
+
+        :param frame: the frame of reference to find a transform path to
+        :type frame: Frame2d
+        :return: the transform path in a format that can be interpreted by
+            Frame2d.transform_via_path().
+        """
+        path = list()
+        current_frame = frame
+        while current_frame != self:
+            path.append((current_frame, "from"))
+            current_frame = current_frame.parent()
+
+        return path[::-1]      # path is generated in reverse
+
 
 # Module variables
 origin2d = RootFrame2d()
@@ -212,6 +230,24 @@ class RootFrame3d:
         self.rotation = Rotation3d.from_euler('xyz', np.array(
                                                         [0, 0, 0],
                                                         dtype=np.float64))
+
+    def find_transform_path(self, frame):
+        """
+        Finds the transform path from this frame of reference to the given
+        frame.
+
+        :param frame: the frame of reference to find a transform path to
+        :type frame: Frame3d
+        :return: the transform path in a format that can be interpreted by
+            Frame3d.transform_via_path().
+        """
+        path = list()
+        current_frame = frame
+        while current_frame != self:
+            path.append((current_frame, "from"))
+            current_frame = current_frame.parent()
+
+        return path[::-1]      # path is generated in reverse
 
 
 origin3d = RootFrame3d()

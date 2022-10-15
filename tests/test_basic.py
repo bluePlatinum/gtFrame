@@ -141,6 +141,38 @@ class TestRootFrame2d:
         assert np.allclose(root_frame.position, np.array([0, 0]), rtol=RTOL)
         assert root_frame.rotation.as_rad() == 0
 
+    def test_find_transform_path(self, frame2d_system):
+        """
+        Test the find_transform_path method of RootFrame2d with static
+        system-structure but random positions and rotations.
+
+        :return: None
+        """
+        frame1 = frame2d_system[0]
+        frame2 = frame2d_system[1]
+        frame3 = frame2d_system[2]
+        frame4 = frame2d_system[3]
+        frame5 = frame2d_system[4]
+        frame6 = frame2d_system[5]
+        frame7 = frame2d_system[6]
+
+        expected1 = [(frame1, "from")]
+        expected2 = [(frame1, "from"), (frame2, "from")]
+        expected3 = [(frame1, "from"), (frame2, "from"), (frame3, "from")]
+        expected4 = [(frame4, "from")]
+        expected5 = [(frame4, "from"), (frame5, "from")]
+        expected6 = [(frame1, "from"), (frame2, "from"), (frame3, "from"),
+                     (frame6, "from")]
+        expected7 = [(frame1, "from"), (frame2, "from"), (frame7, "from")]
+
+        assert expected1 == origin2d.find_transform_path(frame1)
+        assert expected2 == origin2d.find_transform_path(frame2)
+        assert expected3 == origin2d.find_transform_path(frame3)
+        assert expected4 == origin2d.find_transform_path(frame4)
+        assert expected5 == origin2d.find_transform_path(frame5)
+        assert expected6 == origin2d.find_transform_path(frame6)
+        assert expected7 == origin2d.find_transform_path(frame7)
+
 
 class TestFrame2d:
     """
@@ -483,6 +515,38 @@ class TestRootFrame3d:
                            np.array([0, 0, 0], dtype=np.float64), rtol=RTOL)
         assert np.allclose(frame.rotation.as_matrix(), np.identity(3),
                            rtol=RTOL)
+
+    def test_find_transform_path(self, frame3d_system):
+        """
+        Test the find_transform_path method of RootFrame3d with static
+        system-structure but random positions and rotations.
+
+        :return: None
+        """
+        frame1 = frame3d_system[0]
+        frame2 = frame3d_system[1]
+        frame3 = frame3d_system[2]
+        frame4 = frame3d_system[3]
+        frame5 = frame3d_system[4]
+        frame6 = frame3d_system[5]
+        frame7 = frame3d_system[6]
+
+        expected1 = [(frame1, "from")]
+        expected2 = [(frame1, "from"), (frame2, "from")]
+        expected3 = [(frame1, "from"), (frame2, "from"), (frame3, "from")]
+        expected4 = [(frame4, "from")]
+        expected5 = [(frame4, "from"), (frame5, "from")]
+        expected6 = [(frame1, "from"), (frame2, "from"), (frame3, "from"),
+                     (frame6, "from")]
+        expected7 = [(frame1, "from"), (frame2, "from"), (frame7, "from")]
+
+        assert expected1 == origin3d.find_transform_path(frame1)
+        assert expected2 == origin3d.find_transform_path(frame2)
+        assert expected3 == origin3d.find_transform_path(frame3)
+        assert expected4 == origin3d.find_transform_path(frame4)
+        assert expected5 == origin3d.find_transform_path(frame5)
+        assert expected6 == origin3d.find_transform_path(frame6)
+        assert expected7 == origin3d.find_transform_path(frame7)
 
 
 class TestFrame3d:
