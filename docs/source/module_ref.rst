@@ -1,4 +1,4 @@
-.. _module_reference:
+.. _module-reference:
 Module Reference
 ================
 

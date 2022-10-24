@@ -17,7 +17,7 @@ or for 3d-space ::
     from gtFrame.rotation import Frame3d, origin3d
 
 Further information on the different classes can be found in the
-`module_reference`_
+:ref:`module-reference`
 
 Example
 -------
@@ -65,3 +65,27 @@ Now we can set the starting positions for the planet and the moon::
     planet.position = np.array([10, 0, 0], dtype=np.float64)
     moon.position = np.array([0, 1, 0], dtype=np.float64)
 
+Lets find the position of the moon in the sun frame of reference by
+transforming from the planet frame.::
+
+    print(planet.transform_to(sun, moon.position)
+
+This outputs the vector pointing from the sun to the moon.
+Now let's imagine, that the positions have changed over time. In this example
+we choose to move the planet by an eight of its orbit (45° from its original
+position) and the moon by a quarter orbit. This can be achieved with the
+following lines: ::
+
+    planet.position = np.array([10 * math.cos(math.pi / 4),
+                               10 * math.sin(math.pi / 4)], dtype=np.float64)
+    moon.position = np.array([1 * math.cos(math.pi), 1 * math.sin(math.pi)],
+                             dtype=np.float64)
+
+Now we can again calculate the position of the moon in the sun frame and print
+it. ::
+
+    print(planet.transform_to(sun, moon.position))
+
+And there you go! This was a quick example of how to use gtFrame. For more
+examples check out the `other examples on GitHub
+<https://github.com/bluePlatinum/gtFrame/tree/master/examples>`_
