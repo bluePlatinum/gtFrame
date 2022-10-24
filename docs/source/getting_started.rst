@@ -44,6 +44,7 @@ Firstly let's import the modules we will need. ::
 
     from gtFrame.basic import Frame2d, origin2d
     from gtFrame.rotation import Rotation2d
+    import math
     import numpy as np
 
 Firstly let us put the origin at the center of the system, in this case the
