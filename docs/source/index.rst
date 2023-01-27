@@ -10,8 +10,8 @@ Welcome to gtFrame's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   module_reference/basic
-   module_reference/rotation
+   getting_started
+   module_ref
 
 
 
