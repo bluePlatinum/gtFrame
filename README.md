@@ -8,4 +8,4 @@ To install ```gtFrame``` simply use pip:
 
 ## Documentation
 
-Currently documentation is just available by building it yourself with sphinx, but I'll hopefully get to setting up a RTD soon.
+Link to the [docs](https://gtframe.readthedocs.io/en/stable/).
