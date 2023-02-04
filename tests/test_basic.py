@@ -159,6 +159,17 @@ class TestRootFrame2d:
         assert np.allclose(root_frame.position, np.array([0, 0]), rtol=RTOL)
         assert root_frame.rotation.as_rad() == 0
 
+    def test_find_common_parent(self, random_frame2d):
+        """
+        Tests the find_common_parent method. It should always return the root
+        frame itself.
+
+        :return: None
+        """
+        root_frame = RootFrame2d()
+
+        assert root_frame.find_common_parent(random_frame2d) == root_frame
+
     def test_find_transform_path(self, frame2d_system):
         """
         Test the find_transform_path method of RootFrame2d with static
@@ -242,6 +253,38 @@ class TestFrame2d:
 
         with pytest.raises(ValueError):
             frame = Frame2d(position, rot)      # noqa: F841
+
+    def test_find_common_parent(self, frame2d_system):
+        """
+        Tests the find_common_parent method.
+
+        :return: None
+        """
+        frame1 = frame2d_system[0]
+        frame2 = frame2d_system[1]
+        frame3 = frame2d_system[2]
+        frame4 = frame2d_system[3]
+        frame5 = frame2d_system[4]
+        frame6 = frame2d_system[5]
+        frame7 = frame2d_system[6]
+
+        expected0 = frame1      # frame1 and frame3
+        expected1 = frame2      # frame3 and frame7
+        expected2 = origin2d    # frame3 and frame5
+        expected3 = origin2d    # frame4 and origin2d
+        expected4 = frame2      # frame6 and frame7
+
+        result0 = frame1.find_common_parent(frame3)
+        result1 = frame3.find_common_parent(frame7)
+        result2 = frame3.find_common_parent(frame5)
+        result3 = frame4.find_common_parent(origin2d)
+        result4 = frame6.find_common_parent(frame7)
+
+        assert expected0 == result0
+        assert expected1 == result1
+        assert expected2 == result2
+        assert expected3 == result3
+        assert expected4 == result4
 
     def test_find_transform_path(self):
         """
@@ -543,6 +586,17 @@ class TestRootFrame3d:
         assert np.allclose(frame.rotation.as_matrix(), np.identity(3),
                            rtol=RTOL)
 
+    def test_find_common_parent(self, random_frame3d):
+        """
+        Tests the find_common_parent method. It should always return the root
+        frame itself.
+
+        :return: None
+        """
+        root_frame = RootFrame3d()
+
+        assert root_frame.find_common_parent(random_frame3d) == root_frame
+
     def test_find_transform_path(self, frame3d_system):
         """
         Test the find_transform_path method of RootFrame3d with static
@@ -631,6 +685,38 @@ class TestFrame3d:
 
         with pytest.raises(ValueError):
             frame = Frame3d(position, rotation)             # noqa: F841
+
+    def test_find_common_parent(self, frame3d_system):
+        """
+        Tests the find_common_parent method.
+
+        :return: None
+        """
+        frame1 = frame3d_system[0]
+        frame2 = frame3d_system[1]
+        frame3 = frame3d_system[2]
+        frame4 = frame3d_system[3]
+        frame5 = frame3d_system[4]
+        frame6 = frame3d_system[5]
+        frame7 = frame3d_system[6]
+
+        expected0 = frame1      # frame1 and frame3
+        expected1 = frame2      # frame3 and frame7
+        expected2 = origin3d    # frame3 and frame5
+        expected3 = origin3d    # frame4 and origin2d
+        expected4 = frame2      # frame6 and frame7
+
+        result0 = frame1.find_common_parent(frame3)
+        result1 = frame3.find_common_parent(frame7)
+        result2 = frame3.find_common_parent(frame5)
+        result3 = frame4.find_common_parent(origin3d)
+        result4 = frame6.find_common_parent(frame7)
+
+        assert expected0 == result0
+        assert expected1 == result1
+        assert expected2 == result2
+        assert expected3 == result3
+        assert expected4 == result4
 
     def test_find_transform_path(self):
         """

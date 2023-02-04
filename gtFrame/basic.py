@@ -34,6 +34,18 @@ class RootFrame2d:
         self.position = np.array([0, 0], dtype=np.float64)
         self.rotation = gtFrame.rotation.Rotation2d(0)
 
+    def find_common_parent(self, frame):
+        """
+        Finds the nearest common parent of this frame and a given frame. Since
+        this is a RootFrame2d it will always return itself.
+
+        :param frame: other frame
+        :type frame: gtFrame.basic.Frame2d
+        :return: the nearest common parent, which is always self
+        :rtype: gtFrame.basic.RootFrame2d
+        """
+        return self
+
     def find_transform_path(self, frame):
         """
         Finds the transform path from this frame of reference to the given
@@ -81,6 +93,42 @@ class Frame2d:
         self.position = position.copy()
         self.rotation = rotation
         self._parent = parent_frame
+
+    def find_common_parent(self, frame):
+        """
+        Finds the nearest common parent of this frame and a given frame.
+
+        :param frame: other frame
+        :type frame: gtFrame.basic.Frame2d
+        :return: the nearest common parent frame
+        :rtype: gtFrame.basic.Frame2d
+        """
+        # return frame if frame is root frame
+        if type(frame).__name__ == 'RootFrame2d':
+            return frame
+
+        # find path from self to origin
+        current_frame = self
+        path_self = list()
+
+        while type(current_frame).__name__ != 'RootFrame2d':
+            path_self.append(current_frame)
+            current_frame = current_frame.parent()
+
+        # find path from frame to origin
+        current_frame = frame
+        path_foreign = list()
+
+        while type(current_frame).__name__ != 'RootFrame2d':
+            path_foreign.append(current_frame)
+            current_frame = current_frame.parent()
+
+        for frame in path_self:
+            if frame in path_foreign:
+                return frame
+
+        # default: return root-frame (if there is no common parent)
+        return path_self[-1].parent()
 
     def find_transform_path_legacy(self, frame):
         """
@@ -287,6 +335,18 @@ class RootFrame3d:
                                                         [0, 0, 0],
                                                         dtype=np.float64))
 
+    def find_common_parent(self, frame):
+        """
+        Finds the nearest common parent of this frame and a given frame. Since
+        this is a RootFrame3d it will always return itself.
+
+        :param frame: other frame
+        :type frame: gtFrame.basic.Frame3d
+        :return: the nearest common parent, which is always self
+        :rtype: gtFrame.basic.RootFrame3d
+        """
+        return self
+
     def find_transform_path(self, frame):
         """
         Finds the transform path from this frame of reference to the given
@@ -330,6 +390,42 @@ class Frame3d:
         self.position = position.copy()
         self.rotation = rotation
         self._parent = parent_frame
+
+    def find_common_parent(self, frame):
+        """
+        Finds the nearest common parent of this frame and a given frame.
+
+        :param frame: other frame
+        :type frame: gtFrame.basic.Frame3d
+        :return: the nearest common parent frame
+        :rtype: gtFrame.basic.Frame3d
+        """
+        # return frame if frame is root frame
+        if type(frame).__name__ == 'RootFrame3d':
+            return frame
+
+        # find path from self to origin
+        current_frame = self
+        path_self = list()
+
+        while type(current_frame).__name__ != 'RootFrame3d':
+            path_self.append(current_frame)
+            current_frame = current_frame.parent()
+
+        # find path from frame to origin
+        current_frame = frame
+        path_foreign = list()
+
+        while type(current_frame).__name__ != 'RootFrame3d':
+            path_foreign.append(current_frame)
+            current_frame = current_frame.parent()
+
+        for frame in path_self:
+            if frame in path_foreign:
+                return frame
+
+        # default: return root-frame (if there is no common parent)
+        return path_self[-1].parent()
 
     def find_transform_path_legacy(self, frame):
         """
