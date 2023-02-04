@@ -40,6 +40,15 @@ def frame2d_system():
     """
     Generate a system of frames (Frame2d).
 
+    origin
+    ├── Frame 1
+    │   └── Frame 2
+    │       ├── Frame 3
+    │       │   └── Frame 6
+    │       └── Frame 7
+    └── Frame 4
+        └── Frame 5
+
     :return: generated system of frames as a list
     :rtype: list
     """
@@ -79,6 +88,15 @@ def random_frame3d():
 def frame3d_system():
     """
     Generate a system of frames (Frame3d).
+
+    origin
+    ├── Frame 1
+    │   └── Frame 2
+    │       ├── Frame 3
+    │       │   └── Frame 6
+    │       └── Frame 7
+    └── Frame 4
+        └── Frame 5
 
     :return: the generated system of frames as a list
     :rtype: list
@@ -249,12 +267,21 @@ class TestFrame2d:
         path4 = frame2.find_transform_path(frame6)
         path5 = frame7.find_transform_path(origin2d)
 
+        # LEGACY
+        # expected0 = [(frame3, "to"), (frame2, "to")]
+        # expected1 = [(frame6, "to"), (frame3, "to"), (frame2, "to"),
+        #              (frame1, "to"), (frame4, "from"), (frame5, "from")]
+        # expected2 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+        #              (frame1, "from"), (frame2, "from"), (frame3, "from"),
+        #              (frame6, "from")]
+        # expected3 = [(frame5, "to"), (frame4, "to"), (frame1, "from")]
+        # expected4 = [(frame3, "from"), (frame6, "from")]
+        # expected5 = [(frame7, "to"), (frame2, "to"), (frame1, "to")]
+
         expected0 = [(frame3, "to"), (frame2, "to")]
         expected1 = [(frame6, "to"), (frame3, "to"), (frame2, "to"),
                      (frame1, "to"), (frame4, "from"), (frame5, "from")]
-        expected2 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
-                     (frame1, "from"), (frame2, "from"), (frame3, "from"),
-                     (frame6, "from")]
+        expected2 = [(frame7, "to"), (frame3, "from"), (frame6, "from")]
         expected3 = [(frame5, "to"), (frame4, "to"), (frame1, "from")]
         expected4 = [(frame3, "from"), (frame6, "from")]
         expected5 = [(frame7, "to"), (frame2, "to"), (frame1, "to")]
@@ -612,30 +639,39 @@ class TestFrame3d:
 
         :return: None
         """
-        position = np.array([0, 0], dtype=np.float64)
+        position = np.array([0, 0, 0], dtype=np.float64)
         rot = Rotation3d.from_rotvec(np.random.random(3))
 
-        frame1 = Frame2d(position, rot)
-        frame2 = Frame2d(position, rot, parent_frame=frame1)
-        frame3 = Frame2d(position, rot, parent_frame=frame2)
-        frame4 = Frame2d(position, rot)
-        frame5 = Frame2d(position, rot, parent_frame=frame4)
-        frame6 = Frame2d(position, rot, parent_frame=frame3)
-        frame7 = Frame2d(position, rot, parent_frame=frame2)
+        frame1 = Frame3d(position, rot)
+        frame2 = Frame3d(position, rot, parent_frame=frame1)
+        frame3 = Frame3d(position, rot, parent_frame=frame2)
+        frame4 = Frame3d(position, rot)
+        frame5 = Frame3d(position, rot, parent_frame=frame4)
+        frame6 = Frame3d(position, rot, parent_frame=frame3)
+        frame7 = Frame3d(position, rot, parent_frame=frame2)
 
         path0 = frame3.find_transform_path(frame1)
         path1 = frame6.find_transform_path(frame5)
         path2 = frame7.find_transform_path(frame6)
         path3 = frame5.find_transform_path(frame1)
         path4 = frame2.find_transform_path(frame6)
-        path5 = frame7.find_transform_path(origin2d)
+        path5 = frame7.find_transform_path(origin3d)
+
+        # LEGACY
+        # expected0 = [(frame3, "to"), (frame2, "to")]
+        # expected1 = [(frame6, "to"), (frame3, "to"), (frame2, "to"),
+        #              (frame1, "to"), (frame4, "from"), (frame5, "from")]
+        # expected2 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+        #              (frame1, "from"), (frame2, "from"), (frame3, "from"),
+        #              (frame6, "from")]
+        # expected3 = [(frame5, "to"), (frame4, "to"), (frame1, "from")]
+        # expected4 = [(frame3, "from"), (frame6, "from")]
+        # expected5 = [(frame7, "to"), (frame2, "to"), (frame1, "to")]
 
         expected0 = [(frame3, "to"), (frame2, "to")]
         expected1 = [(frame6, "to"), (frame3, "to"), (frame2, "to"),
                      (frame1, "to"), (frame4, "from"), (frame5, "from")]
-        expected2 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
-                     (frame1, "from"), (frame2, "from"), (frame3, "from"),
-                     (frame6, "from")]
+        expected2 = [(frame7, "to"), (frame3, "from"), (frame6, "from")]
         expected3 = [(frame5, "to"), (frame4, "to"), (frame1, "from")]
         expected4 = [(frame3, "from"), (frame6, "from")]
         expected5 = [(frame7, "to"), (frame2, "to"), (frame1, "to")]
