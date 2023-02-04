@@ -82,8 +82,11 @@ class Frame2d:
         self.rotation = rotation
         self._parent = parent_frame
 
-    def find_transform_path(self, frame):
+    def find_transform_path_legacy(self, frame):
         """
+        [LEGACY METHOD] This is same as find_transform_path but without the
+        optimization.
+
         Finds the reference path from this frame of reference to the given
         frame of reference. This is mainly used for the .transform_from and
         .transform_to methods. (This method is identical to
@@ -129,6 +132,59 @@ class Frame2d:
             current_frame = current_frame.parent()
 
         path = self_to_origin + frame_to_origin[::-1]
+        return path
+
+    def find_transform_path(self, frame):
+        """
+        Finds the reference path from this frame of reference to the given
+        frame of reference. This is mainly used for the .transform_from and
+        .transform_to methods. (This method is identical to
+        :meth:`Frame3d.find_transform_path`.)
+
+        :param frame: the destination frame of reference
+        :type frame: Frame2d
+        :return: the path as a list with the first step on [0] and the last at
+            [-1]
+        :rtype: list
+        """
+
+        # ------------------------
+        # this frame to the origin
+        self_to_origin = list()
+        current_frame = self
+
+        while current_frame != origin2d:
+
+            # check if desired frame is in the branch
+            if current_frame == frame:
+                return self_to_origin
+
+            self_to_origin.append((current_frame, "to"))
+            current_frame = current_frame.parent()
+
+        # -------------------------------
+        # destination frame to the origin
+        frame_to_origin = list()
+        current_frame = frame
+
+        while current_frame != origin2d:
+
+            # check if self frame is on the branch of frame
+            if current_frame == self:
+                return frame_to_origin[::-1]        # invert path to flip ends
+
+            frame_to_origin.append((current_frame, "from"))
+            current_frame = current_frame.parent()
+
+        path = self_to_origin + frame_to_origin[::-1]
+
+        # optimisations: cut out all occurrences of two same frames
+        for i, node in enumerate(path):
+            for j, node_secondary in enumerate(path[i:]):
+                if node_secondary[0] == node[0] and node_secondary[1] != node[1]:
+                    del path[i:i+j+1]
+                    break
+
         return path
 
     def parent(self):
@@ -275,8 +331,11 @@ class Frame3d:
         self.rotation = rotation
         self._parent = parent_frame
 
-    def find_transform_path(self, frame):
+    def find_transform_path_legacy(self, frame):
         """
+        [LEGACY METHOD] This is same as find_transform_path but without the
+        optimization.
+
         Finds the reference path from this frame of reference to the given
         frame of reference. This is mainly used for the .transform_from and
         .transform_to methods. (This method is identical to
@@ -322,6 +381,58 @@ class Frame3d:
             current_frame = current_frame.parent()
 
         path = self_to_origin + frame_to_origin[::-1]
+        return path
+
+    def find_transform_path(self, frame):
+        """
+        Finds the reference path from this frame of reference to the given
+        frame of reference. This is mainly used for the .transform_from and
+        .transform_to methods. (This method is identical to
+        :meth:`Frame2d.find_transform_path`.)
+
+        :param frame: the destination frame of reference
+        :type frame: Frame3d
+        :return: the path as a list with the first step on [0] and the last at
+            [-1]
+        :rtype: list
+        """
+        # ------------------------
+        # this frame to the origin
+        self_to_origin = list()
+        current_frame = self
+
+        while current_frame != origin3d:
+
+            # check if desired frame is in the branch
+            if current_frame == frame:
+                return self_to_origin
+
+            self_to_origin.append((current_frame, "to"))
+            current_frame = current_frame.parent()
+
+        # -------------------------------
+        # destination frame to the origin
+        frame_to_origin = list()
+        current_frame = frame
+
+        while current_frame != origin3d:
+
+            # check if self frame is on the branch of frame
+            if current_frame == self:
+                return frame_to_origin[::-1]        # invert path to flip ends
+
+            frame_to_origin.append((current_frame, "from"))
+            current_frame = current_frame.parent()
+
+        path = self_to_origin + frame_to_origin[::-1]
+
+        # optimisations: cut out all occurrences of two same frames
+        for i, node in enumerate(path):
+            for j, node_secondary in enumerate(path[i:]):
+                if node_secondary[0] == node[0] and node_secondary[1] != node[1]:
+                    del path[i:i + j + 1]
+                    break
+
         return path
 
     def parent(self):
