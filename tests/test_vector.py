@@ -27,6 +27,31 @@ def random_frame2d():
     rotation = Rotation2d(angle)
     return Frame2d(position, rotation)
 
+@pytest.fixture
+def frame2d_system():
+    """
+    Generate a system of frames (Frame2d).
+
+    :return: generated system of frames as a list
+    :rtype: list
+    """
+    system = list()
+    desired_parents = ["O", 0, 1, "O", 3, 2, 1]
+
+    for parent_idx in desired_parents:
+        position = np.random.random(2)
+        angle = random.random() * (2 * math.pi)
+        rotation = Rotation2d(angle)
+
+        if parent_idx == "O":
+            frame = Frame2d(position, rotation)
+        else:
+            frame = Frame2d(position, rotation,
+                            parent_frame=system[parent_idx])
+        system.append(frame)
+
+    return system
+
 
 class TestVector2d:
     """
@@ -43,3 +68,21 @@ class TestVector2d:
 
         assert vector.reference == random_frame2d
         assert np.allclose(vector.coordinates, coordinates, rtol=RTOL)
+
+    def test_transform_to(self, frame2d_system):
+        """
+        Test the transform_to method. This assumes, that the transform between
+        Frame2d is correct.
+        :return: None
+        """
+        frameA = frame2d_system[random.randint(0, len(frame2d_system))]
+        frameB = frame2d_system[random.randint(0, len(frame2d_system))]
+
+        coordinates = np.random.random(3)
+        vector = Vector2d(frameA, coordinates)
+
+        expected = frameA.transform_to(frameB, coordinates)
+
+        assert np.allclose(vector.transform_to(frameB), expected, rtol=RTOL)
+
+

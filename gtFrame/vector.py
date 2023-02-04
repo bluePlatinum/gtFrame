@@ -29,3 +29,14 @@ class Vector2d:
         """
         self.reference = reference
         self.coordinates = coordinates
+
+    def transform_to(self, reference):
+        """
+        Returns the representation (i.e. the coordinates) of the vector in a
+        different frame of reference
+        :param reference: the reference to convert to
+        :type reference: gtFrame.basic.Frame2d
+        :return: coordinates in the 'reference' frame of reference
+        :rtype: np.ndarray
+        """
+        return self.reference.transform_to(reference, self.coordinates)
