@@ -27,6 +27,7 @@ def random_frame2d():
     rotation = Rotation2d(angle)
     return Frame2d(position, rotation)
 
+
 @pytest.fixture
 def frame2d_system():
     """
@@ -60,9 +61,10 @@ class TestVector2d:
     def test_constructor(self, random_frame2d):
         """
         Test the constructor of Vector2d
+
         :return: None
         """
-        coordinates = np.random.random(3)
+        coordinates = np.random.random(2)
 
         vector = Vector2d(random_frame2d, coordinates)
 
@@ -73,16 +75,15 @@ class TestVector2d:
         """
         Test the transform_to method. This assumes, that the transform between
         Frame2d is correct.
+
         :return: None
         """
-        frameA = frame2d_system[random.randint(0, len(frame2d_system))]
-        frameB = frame2d_system[random.randint(0, len(frame2d_system))]
+        frame_a = frame2d_system[random.randint(0, len(frame2d_system) - 1)]
+        frame_b = frame2d_system[random.randint(0, len(frame2d_system) - 1)]
 
-        coordinates = np.random.random(3)
-        vector = Vector2d(frameA, coordinates)
+        coordinates = np.random.random(2)
+        vector = Vector2d(frame_a, coordinates)
 
-        expected = frameA.transform_to(frameB, coordinates)
+        expected = frame_a.transform_to(frame_b, coordinates)
 
-        assert np.allclose(vector.transform_to(frameB), expected, rtol=RTOL)
-
-
+        assert np.allclose(vector.transform_to(frame_b), expected, rtol=RTOL)
