@@ -273,18 +273,21 @@ class TestFrame2d:
         expected2 = origin2d    # frame3 and frame5
         expected3 = origin2d    # frame4 and origin2d
         expected4 = frame2      # frame6 and frame7
+        expected5 = frame5      # frame5 and frame5
 
         result0 = frame1.find_common_parent(frame3)
         result1 = frame3.find_common_parent(frame7)
         result2 = frame3.find_common_parent(frame5)
         result3 = frame4.find_common_parent(origin2d)
         result4 = frame6.find_common_parent(frame7)
+        result5 = frame5.find_common_parent(frame5)
 
         assert expected0 == result0
         assert expected1 == result1
         assert expected2 == result2
         assert expected3 == result3
         assert expected4 == result4
+        assert expected5 == result5
 
     def test_find_transform_path(self):
         """
@@ -705,18 +708,21 @@ class TestFrame3d:
         expected2 = origin3d    # frame3 and frame5
         expected3 = origin3d    # frame4 and origin2d
         expected4 = frame2      # frame6 and frame7
+        expected5 = frame5      # frame5 and frame5
 
         result0 = frame1.find_common_parent(frame3)
         result1 = frame3.find_common_parent(frame7)
         result2 = frame3.find_common_parent(frame5)
         result3 = frame4.find_common_parent(origin3d)
         result4 = frame6.find_common_parent(frame7)
+        result5 = frame5.find_common_parent(frame5)
 
         assert expected0 == result0
         assert expected1 == result1
         assert expected2 == result2
         assert expected3 == result3
         assert expected4 == result4
+        assert expected5 == result5
 
     def test_find_transform_path(self):
         """
