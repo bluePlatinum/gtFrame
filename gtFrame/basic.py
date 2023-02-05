@@ -64,6 +64,36 @@ class RootFrame2d:
 
         return path[::-1]      # path is generated in reverse
 
+    def transform_from(self, frame, vector):
+        """
+        Transform a vector expressed in an arbitrary frame of reference into
+        this frame.
+
+        :param frame: the frame of reference, in which the vector is defined
+        :type frame: Frame2d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        path = frame.find_transform_path(self)
+        return Frame2d.transform_via_path(vector, path)
+
+    def transform_to(self, frame, vector):
+        """
+        Transform a vector expressed in this frame of reference into a given
+        frame of reference.
+
+        :param frame: the frame to which to transform to
+        :type frame: Frame2d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        path = self.find_transform_path(frame)
+        return Frame2d.transform_via_path(vector, path)
+
 
 # Module variables
 origin2d = RootFrame2d()
@@ -365,6 +395,36 @@ class RootFrame3d:
             current_frame = current_frame.parent()
 
         return path[::-1]      # path is generated in reverse
+
+    def transform_from(self, frame, vector):
+        """
+        Transform a vector expressed in an arbitrary frame of reference into
+        this frame.
+
+        :param frame: the frame of reference, in which the vector is defined
+        :type frame: Frame3d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        path = frame.find_transform_path(self)
+        return Frame3d.transform_via_path(vector, path)
+
+    def transform_to(self, frame, vector):
+        """
+        Transform a vector expressed in this frame of reference into a given
+        frame of reference.
+
+        :param frame: the frame to which to transform to
+        :type frame: Frame3d
+        :param vector: the vector to be transformed
+        :type vector: np.ndarray
+        :return: the transformed vector
+        :rtype: np.ndarray
+        """
+        path = self.find_transform_path(frame)
+        return Frame3d.transform_via_path(vector, path)
 
 
 origin3d = RootFrame3d()

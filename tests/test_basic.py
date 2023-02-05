@@ -202,6 +202,70 @@ class TestRootFrame2d:
         assert expected6 == origin2d.find_transform_path(frame6)
         assert expected7 == origin2d.find_transform_path(frame7)
 
+    def test_transform_from(self, frame2d_system):
+        """
+        Test the .transform_from method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = frame2d_system[random.randint(0, 6)]
+            destination = origin2d
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame2d.transform_via_path(vector, path)
+
+            assert np.allclose(destination.transform_from(source, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_to(self, frame2d_system):
+        """
+        Test the .transform_to method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = origin2d
+            destination = frame2d_system[random.randint(0, 6)]
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame2d.transform_via_path(vector, path)
+
+            assert np.allclose(source.transform_to(destination, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_reversible(self, frame2d_system):
+        """
+        Test wether the .transform_to and transform_from methods are
+        reversible.
+
+        :return: None
+        """
+        vectors = [np.random.random(2) for _ in range(10)]
+
+        for vector in vectors:
+            source = origin2d
+            destination = frame2d_system[random.randint(0, 6)]
+
+            interim = source.transform_to(destination, vector)
+            result = source.transform_from(destination, interim)
+
+            assert np.allclose(result, vector, rtol=RTOL)
+
 
 class TestFrame2d:
     """
@@ -631,6 +695,70 @@ class TestRootFrame3d:
         assert expected5 == origin3d.find_transform_path(frame5)
         assert expected6 == origin3d.find_transform_path(frame6)
         assert expected7 == origin3d.find_transform_path(frame7)
+
+    def test_transform_from(self, frame3d_system):
+        """
+        Test the .transform_from method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(3) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = frame3d_system[random.randint(0, 6)]
+            destination = origin3d
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame3d.transform_via_path(vector, path)
+
+            assert np.allclose(destination.transform_from(source, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_to(self, frame3d_system):
+        """
+        Test the .transform_to method with random vectors and random paths.
+
+        :return: None
+        """
+        vectors = [np.random.random(3) for _ in range(10)]
+
+        for vector in vectors:
+            vector_copy = vector.copy()
+            source = origin3d
+            destination = frame3d_system[random.randint(0, 6)]
+
+            # calculate expected
+            path = source.find_transform_path(destination)
+            expected = Frame3d.transform_via_path(vector, path)
+
+            assert np.allclose(source.transform_to(destination, vector),
+                               expected, rtol=RTOL)
+
+            # Check that vector didn't change
+            assert np.allclose(vector, vector_copy, rtol=RTOL)
+
+    def test_transform_reversible(self, frame3d_system):
+        """
+        Test wether the .transform_to and transform_from methods are
+        reversible.
+
+        :return: None
+        """
+        vectors = [np.random.random(3) for _ in range(10)]
+
+        for vector in vectors:
+            source = origin3d
+            destination = frame3d_system[random.randint(0, 6)]
+
+            interim = source.transform_to(destination, vector)
+            result = source.transform_from(destination, interim)
+
+            assert np.allclose(result, vector, rtol=RTOL)
 
 
 class TestFrame3d:
