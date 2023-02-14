@@ -209,7 +209,8 @@ class Frame2d:
         # optimisations: cut out all occurrences of two same frames
         for i, node in enumerate(path):
             for j, node_secondary in enumerate(path[i:]):
-                if node_secondary[0] == node[0] and node_secondary[1] != node[1]:
+                if node_secondary[0] == node[0] and \
+                        node_secondary[1] != node[1]:
                     del path[i:i+j+1]
                     break
 
@@ -485,7 +486,8 @@ class Frame3d:
         # optimisations: cut out all occurrences of two same frames
         for i, node in enumerate(path):
             for j, node_secondary in enumerate(path[i:]):
-                if node_secondary[0] == node[0] and node_secondary[1] != node[1]:
+                if node_secondary[0] == node[0] and \
+                        node_secondary[1] != node[1]:
                     del path[i:i + j + 1]
                     break
 
