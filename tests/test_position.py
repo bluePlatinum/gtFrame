@@ -104,7 +104,7 @@ class TestPosition2d:
         frame = random_frame2d()
 
         with pytest.raises(ValueError):
-            position = Position2d(coordinates, frame)
+            position = Position2d(coordinates, frame)       # noqa: F841
 
     def test_eq(self):
         """
@@ -168,7 +168,7 @@ class TestPosition3d:
         frame = random_frame3d()
 
         with pytest.raises(ValueError):
-            position = Position3d(coordinates, frame)
+            position = Position3d(coordinates, frame)       # noqa:F841
 
     def test_eq(self):
         """
