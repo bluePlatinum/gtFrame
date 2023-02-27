@@ -13,6 +13,9 @@ Classes:
     * Direction3d
 """
 
+import numpy as np
+
+from gtFrame import DEFAULT_RTOL
 from gtFrame.basic import Frame2d, Frame3d
 
 
@@ -26,8 +29,12 @@ class Direction2d:
     :type vector: np.ndarray
     :param reference: the frame of reference on which the vector is defined
     :type reference: gtFrame.basic.Frame2d
+    :param rtol: The relative tolerance to be used when comparing
+        Direction2d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
     """
-    def __init__(self, vector, reference):
+    def __init__(self, vector, reference, rtol=DEFAULT_RTOL):
         """
         Constructor method.
         """
@@ -35,6 +42,26 @@ class Direction2d:
             raise ValueError("The direction vector has to be two dimensional.")
         self.vector = vector
         self.reference = reference
+        self.rtol = rtol
+
+    def __eq__(self, other):
+        """
+        Compares two Direction2d objects and evaluates if they both point in
+        the same direction. Returns True if both the directions match and
+        False otherwise.
+
+        :param other: the other Direction2d object
+        :type other: gtFrame.direction.Direction2d
+        :return: returns True if the directions match within tolerance and
+            False if not
+        :rtype: bool
+        """
+        if not isinstance(other, Direction2d):
+            raise TypeError("Can only compare Direction2d to Direction2d"
+                            "objects.")
+
+        transformed = other.transform_to(self.reference)
+        return np.allclose(self.vector, transformed, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
@@ -59,8 +86,12 @@ class Direction3d:
     :type vector: np.ndarray
     :param reference: the frame of reference on which the vector is defined
     :type reference: gtFrame.basic.Frame3d
+    :param rtol: The relative tolerance to be used when comparing
+        Direction3d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
     """
-    def __init__(self, vector, reference):
+    def __init__(self, vector, reference, rtol=DEFAULT_RTOL):
         """
         Constructor method.
         """
@@ -69,6 +100,26 @@ class Direction3d:
                              "dimensional.")
         self.vector = vector
         self.reference = reference
+        self.rtol = rtol
+
+    def __eq__(self, other):
+        """
+        Compares two Direction3d objects and evaluates if they both point in
+        the same direction. Returns True if both the directions match and
+        False otherwise.
+
+        :param other: the other Direction3d object
+        :type other: gtFrame.direction.Direction3d
+        :return: returns True if the directions match within tolerance and
+            False if not
+        :rtype: bool
+        """
+        if not isinstance(other, Direction3d):
+            raise TypeError("Can only compare Direction3d to Direction3d"
+                            "objects.")
+
+        transformed = other.transform_to(self.reference)
+        return np.allclose(self.vector, transformed, rtol=self.rtol)
 
     def transform_to(self, reference):
         """

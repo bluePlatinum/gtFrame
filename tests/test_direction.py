@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation as Rotation3d
 
+from gtFrame import DEFAULT_RTOL
 from gtFrame.basic import Frame2d, Frame3d, origin2d, origin3d
 from gtFrame.direction import Direction2d, Direction3d
 from gtFrame.rotation import Rotation2d
@@ -74,6 +75,40 @@ class TestDirection2d:
 
         with pytest.raises(ValueError):
             direction = Direction2d(vector, frame)      # noqa: F841
+
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of rtol in the constructor.
+        """
+        vector = np.random.random(2)
+        frame = random_frame2d()
+        rtol = random.random()
+
+        direction_a = Direction2d(vector, frame)
+        direction_b = Direction2d(vector, frame, rtol=rtol)
+
+        assert direction_a.rtol == DEFAULT_RTOL
+        assert direction_b.rtol == rtol
+
+    def test_eq(self):
+        """
+        Tests the .__eq__ method with random values.
+        """
+        vector = np.random.random(2)
+        last_frame = origin2d
+        direction_a = Direction2d(vector, last_frame)
+
+        for i in range(random.randint(1, 100)):
+            frame = random_frame2d(last_frame)
+            last_frame = frame
+
+            # rotate vector
+            path = direction_a.reference.find_transform_path(frame)
+            rotated = Frame2d.rotate_via_path(vector, path)
+
+            direction_b = Direction2d(rotated, frame)
+
+            assert direction_a == direction_b
 
     def test_transform_to_random(self):
         """
@@ -148,6 +183,20 @@ class TestDirection3d:
         with pytest.raises(ValueError):
             direction = Direction3d(vector, frame)      # noqa: F841
 
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of rtol in the constructor.
+        """
+        vector = np.random.random(3)
+        frame = random_frame3d()
+        rtol = random.random()
+
+        direction_a = Direction3d(vector, frame)
+        direction_b = Direction3d(vector, frame, rtol=rtol)
+
+        assert direction_a.rtol == DEFAULT_RTOL
+        assert direction_b.rtol == rtol
+
     def test_transform_to_random(self):
         """
         Tests whether the .transform_to method with random values.
@@ -164,6 +213,26 @@ class TestDirection3d:
 
         assert np.allclose(direction.transform_to(latest_frame), rotated,
                            rtol=RTOL)
+
+    def test_eq(self):
+        """
+        Tests the .__eq__ method with random values.
+        """
+        vector = np.random.random(3)
+        last_frame = origin3d
+        direction_a = Direction3d(vector, last_frame)
+
+        for i in range(random.randint(1, 100)):
+            frame = random_frame3d(last_frame)
+            last_frame = frame
+
+            # rotate vector
+            path = direction_a.reference.find_transform_path(frame)
+            rotated = Frame3d.rotate_via_path(vector, path)
+
+            direction_b = Direction3d(rotated, frame)
+
+            assert direction_a == direction_b
 
     def test_transform_to_compare(self):
         """
