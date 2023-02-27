@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from scipy.spatial.transform import Rotation as Rotation3d
 
+from gtFrame import DEFAULT_RTOL
 from gtFrame.basic import Frame2d, Frame3d, origin2d, origin3d
 from gtFrame.position import Position2d, Position3d
 from gtFrame.rotation import Rotation2d
@@ -106,6 +107,20 @@ class TestPosition2d:
         with pytest.raises(ValueError):
             position = Position2d(coordinates, frame)       # noqa: F841
 
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of the rtol attribute on init.
+        """
+        coordinates = np.random.random(2)
+        frame = random_frame2d()
+        rtol = random.random()
+
+        position_a = Position2d(coordinates, frame)
+        position_b = Position2d(coordinates, frame, rtol=rtol)
+
+        assert position_a.rtol == DEFAULT_RTOL
+        assert position_b.rtol == rtol
+
     def test_eq(self):
         """
         Tests the == operator (i.e. the __eq__ method).
@@ -169,6 +184,20 @@ class TestPosition3d:
 
         with pytest.raises(ValueError):
             position = Position3d(coordinates, frame)       # noqa:F841
+
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of the rtol attribute on init.
+        """
+        coordinates = np.random.random(3)
+        frame = random_frame3d()
+        rtol = random.random()
+
+        position_a = Position3d(coordinates, frame)
+        position_b = Position3d(coordinates, frame, rtol=rtol)
+
+        assert position_a.rtol == DEFAULT_RTOL
+        assert position_b.rtol == rtol
 
     def test_eq(self):
         """
