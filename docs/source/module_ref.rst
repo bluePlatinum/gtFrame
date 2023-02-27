@@ -9,5 +9,6 @@ This is a reference for all the available modules.
    :caption: Modules
 
    module_reference/basic.rst
+   module_reference/direction.rst
    module_reference/position.rst
    module_reference/rotation.rst

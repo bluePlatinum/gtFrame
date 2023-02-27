@@ -21,10 +21,41 @@ from gtFrame.rotation import Rotation2d
 RTOL = 1e-12
 
 
+def generate_frame2d(parent=origin2d):
+    """
+    Generate a random :class:`gtFrame.basic.Frame2d`.
+
+    :param parent: The parent of the generated :class:`gtFrame.basic.Frame2d`
+        object. The default is origin2d.
+    :type parent: gtFrame.basic.Frame2d
+    :return: randomly generated Frame2d
+    :rtype: gtFrame.basic.Frame2d
+    """
+    position = np.random.random(2)
+    angle = random.random() * (2 * math.pi)
+    rotation = Rotation2d(angle)
+    return Frame2d(position, rotation, parent_frame=parent)
+
+
+def generate_frame3d(parent=origin3d):
+    """
+    Generate a random :class:`gtFrame.basic.Frame3d`.
+
+    :param parent: The parent of the generated :class:`gtFrame.basic.Frame3d`
+        object. The default is origin3d.
+    :type parent: gtFrame.basic.Frame3d
+    :return: randomly generated Frame3d
+    :rtype: gtFrame.basic.Frame3d
+    """
+    position = np.random.random(3)
+    rotation = Rotation3d.from_rotvec(np.random.random(3))
+    return Frame3d(position, rotation, parent_frame=parent)
+
+
 @pytest.fixture
 def random_frame2d():
     """
-    Generate a random :class:`gtFrame.basic.Frame2d.`
+    Generate a random :class:`gtFrame.basic.Frame2d`.
 
     :return: randomly generated Frame2d
     :rtype: gtFrame.basic.Frame2d
@@ -366,6 +397,112 @@ class TestFrame2d:
         frame = Frame2d(position, rot, parent_frame=random_frame2d)
 
         assert frame.parent() == random_frame2d
+
+    def test_rotate_via_path_static(self):
+        """
+        Test the .rotate_via_path method with static values.
+
+        :return: None
+        """
+        # Testcase 1
+        # Rotating a vector by 90 degrees
+        vector = np.array([1, 0])
+        rotation = Rotation2d(math.pi / 2)
+        frame = Frame2d(np.random.random(2), rotation)
+        path = origin2d.find_transform_path(frame)
+        expected = np.array([0, -1])
+        result = Frame2d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+        # Testcase 2
+        # Rotating a vector by 90 degrees twice
+        vector = np.array([0, 1])
+        rotation1 = Rotation2d(math.pi / 2)
+        rotation2 = Rotation2d(- math.pi / 2)
+        frame1 = Frame2d(np.random.random(2), rotation1)
+        frame2 = Frame2d(np.random.random(2), rotation2)
+        path = frame1.find_transform_path(frame2)
+        expected = np.array([0, -1])
+        result = Frame2d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+        # Testcase 3
+        # Rotating a vector by 45 degrees
+        vector = np.array([1, 0])
+        rotation = Rotation2d(math.pi / 4)
+        frame = Frame2d(np.random.random(2), rotation)
+        path = frame.find_transform_path(origin2d)
+        expected = np.array([1 / math.sqrt(2), 1 / math.sqrt(2)])
+        result = Frame2d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+    def test_rotate_via_path_random(self):
+        """
+        Test the .rotate_via_path method with a chain of random Frames.
+
+        :return: None
+        """
+        vector = np.random.random(2)
+        rotated = vector
+        last_frame = origin2d
+
+        for i in range(random.randint(1, 100)):
+            frame = generate_frame2d(last_frame)
+            last_frame = frame
+            rotated = frame.rotation.apply_inverse(rotated)
+
+        path = origin2d.find_transform_path(last_frame)
+        result = Frame2d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, rotated, rtol=RTOL)
+
+    def test_rotate_via_path_system(self, frame2d_system):
+        """
+        Test the .rotate_via_path method with a Frame2d system.
+
+        :return: None
+        """
+        # Frame assignments
+        frame1 = frame2d_system[0]
+        frame2 = frame2d_system[1]
+        frame3 = frame2d_system[2]
+        frame4 = frame2d_system[3]
+        frame5 = frame2d_system[4]
+        frame6 = frame2d_system[5]
+        frame7 = frame2d_system[6]
+
+        # Testcase 0 frame7 -> frame3
+        vector0 = np.random.random(2)
+        path0 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+                 (frame1, "from"), (frame2, "from"), (frame3, "from")]
+        intermediate0 = frame7.rotation.apply(vector0)
+        expected0 = frame3.rotation.apply_inverse(intermediate0)
+
+        # Testcase 1 frame6 -> frame1
+        vector1 = np.random.random(2)
+        path1 = [(frame6, "to"), (frame3, "to"), (frame2, "to")]
+        intermediate1 = frame6.rotation.apply(vector1)
+        intermediate1 = frame3.rotation.apply(intermediate1)
+        expected1 = frame2.rotation.apply(intermediate1)
+
+        # Testcase 2 frame5 -> frame2
+        vector2 = np.random.random(2)
+        path2 = [(frame5, "to"), (frame4, "to"), (frame1, "from"),
+                 (frame2, "from")]
+        intermediate2 = frame5.rotation.apply(vector2)
+        intermediate2 = frame4.rotation.apply(intermediate2)
+        intermediate2 = frame1.rotation.apply_inverse(intermediate2)
+        expected2 = frame2.rotation.apply_inverse(intermediate2)
+
+        assert np.allclose(Frame2d.rotate_via_path(vector0, path0),
+                           expected0, rtol=RTOL)
+        assert np.allclose(Frame2d.rotate_via_path(vector1, path1),
+                           expected1, rtol=RTOL)
+        assert np.allclose(Frame2d.rotate_via_path(vector2, path2),
+                           expected2, rtol=RTOL)
 
     def test_transform_from_parent_static(self):
         """
@@ -817,6 +954,114 @@ class TestFrame3d:
 
         assert frame.parent() == random_frame3d
 
+    def test_rotate_via_path_static(self):
+        """
+        Test the .rotate_via_path method with static values.
+
+        :return: None
+        """
+        # Testcase 1
+        # Rotating a vector by 90 degrees
+        vector = np.array([1, 0, 0])
+        rotation = Rotation3d.from_rotvec(np.array([0, 0, math.pi / 2]))
+        frame = Frame3d(np.random.random(3), rotation)
+        path = origin3d.find_transform_path(frame)
+        expected = np.array([0, -1, 0])
+        result = Frame3d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+        # Testcase 2
+        # Rotating a vector by 90 degrees twice
+        vector = np.array([0, 1, 0])
+        rotation1 = Rotation3d.from_rotvec(np.array([0, 0, math.pi / 2]))
+        rotation2 = Rotation3d.from_rotvec(np.array([0, 0, - math.pi / 2]))
+        frame1 = Frame3d(np.random.random(3), rotation1)
+        frame2 = Frame3d(np.random.random(3), rotation2)
+        path = frame1.find_transform_path(frame2)
+        expected = np.array([0, -1, 0])
+        result = Frame3d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+        # Testcase 3
+        # Rotating a vector by 45 degrees
+        vector = np.array([1, 0, 0])
+        rotation = Rotation3d.from_rotvec(np.array([0, 0, math.pi / 4]))
+        frame = Frame3d(np.random.random(3), rotation)
+        path = frame.find_transform_path(origin3d)
+        expected = np.array([1 / math.sqrt(2), 1 / math.sqrt(2), 0])
+        result = Frame3d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, expected, rtol=RTOL)
+
+    def test_rotate_via_path_random(self):
+        """
+        Test the .rotate_via_path method with a chain of random Frames.
+
+        :return: None
+        """
+        vector = np.random.random(3)
+        rotated = vector
+        last_frame = origin3d
+
+        for i in range(random.randint(1, 100)):
+            frame = generate_frame3d(last_frame)
+            last_frame = frame
+            rotated = frame.rotation.inv().apply(rotated)
+
+        path = origin3d.find_transform_path(last_frame)
+        result = Frame3d.rotate_via_path(vector, path)
+
+        assert np.allclose(result, rotated, rtol=RTOL)
+
+    def test_rotate_via_path_system(self, frame3d_system):
+        """
+        Test the .transform_via_path static method with a static path but with
+        random orientations and vectors.
+        (This test is the same as the test for Frame2d.transform_via_path)
+
+        :return: None
+        """
+        # Frame assignments
+        frame1 = frame3d_system[0]
+        frame2 = frame3d_system[1]
+        frame3 = frame3d_system[2]
+        frame4 = frame3d_system[3]
+        frame5 = frame3d_system[4]
+        frame6 = frame3d_system[5]
+        frame7 = frame3d_system[6]
+
+        # Testcase 0 frame7 -> frame3
+        vector0 = np.random.random(3)
+        path0 = [(frame7, "to"), (frame2, "to"), (frame1, "to"),
+                 (frame1, "from"), (frame2, "from"), (frame3, "from")]
+        intermediate0 = frame7.rotation.apply(vector0)
+        expected0 = frame3.rotation.inv().apply(intermediate0)
+
+        # Testcase 1 frame6 -> frame1
+        vector1 = np.random.random(3)
+        path1 = [(frame6, "to"), (frame3, "to"), (frame2, "to")]
+        intermediate1 = frame6.rotation.apply(vector1)
+        intermediate1 = frame3.rotation.apply(intermediate1)
+        expected1 = frame2.rotation.apply(intermediate1)
+
+        # Testcase 2 frame5 -> frame2
+        vector2 = np.random.random(3)
+        path2 = [(frame5, "to"), (frame4, "to"), (frame1, "from"),
+                 (frame2, "from")]
+        intermediate2 = frame5.rotation.apply(vector2)
+        intermediate2 = frame4.rotation.apply(intermediate2)
+        intermediate2 = frame1.rotation.inv().apply(intermediate2)
+        expected2 = frame2.rotation.inv().apply(intermediate2)
+
+        assert np.allclose(Frame3d.rotate_via_path(vector0, path0),
+                           expected0, rtol=RTOL)
+        assert np.allclose(Frame3d.rotate_via_path(vector1, path1),
+                           expected1, rtol=RTOL)
+        assert np.allclose(Frame3d.rotate_via_path(vector2, path2),
+                           expected2, rtol=RTOL)
+
     def test_transform_from_parent_static(self):
         """
         Test the .transform_from_parent method.
@@ -1054,9 +1299,9 @@ class TestFrame3d:
         intermediate2 = frame1.transform_from_parent(intermediate2)
         expected2 = frame2.transform_from_parent(intermediate2)
 
-        assert np.allclose(Frame2d.transform_via_path(vector0, path0),
+        assert np.allclose(Frame3d.transform_via_path(vector0, path0),
                            expected0, rtol=RTOL)
-        assert np.allclose(Frame2d.transform_via_path(vector1, path1),
+        assert np.allclose(Frame3d.transform_via_path(vector1, path1),
                            expected1, rtol=RTOL)
-        assert np.allclose(Frame2d.transform_via_path(vector2, path2),
+        assert np.allclose(Frame3d.transform_via_path(vector2, path2),
                            expected2, rtol=RTOL)
