@@ -15,6 +15,10 @@ from gtFrame.rotation import Rotation2d
 # TOLERANCES
 RTOL = 1e-12
 
+# Defines how many iterations tests should run which run multiple times.
+# ITERS
+ITERS = 10
+
 
 def random_frame2d(parent=origin2d):
     """
@@ -62,14 +66,59 @@ class TestDirection2d:
 
     def test_constructor_exception(self):
         """
-        Tests whether the constructor thows an exception if the wrong dim array
-        is passed.
+        Tests whether the constructor throws an exception if an array with the
+        wrong dimension is passed.
         """
         vector = np.random.random(random.randint(3, 100))
         frame = random_frame2d()
 
         with pytest.raises(ValueError):
             direction = Direction2d(vector, frame)      # noqa: F841
+
+    def test_transform_to_random(self):
+        """
+        Tests whether the .transform_to method with random values.
+        """
+        vector = np.random.random(2)
+        latest_frame = origin2d
+        direction = Direction2d(vector, origin2d)
+        rotated = vector
+
+        for i in range(random.randint(1, 100)):
+            frame = random_frame2d(latest_frame)
+            latest_frame = frame
+            rotated = frame.rotation.apply_inverse(rotated)
+
+        assert np.allclose(direction.transform_to(latest_frame), rotated,
+                           rtol=RTOL)
+
+    def test_transform_to_compare(self):
+        """
+        Tests the .transform_to method by comparing it against .transform_to
+        from Frame2d. If all the frames are pivoting around the same point
+        (chosen to be [0, 0]) then the result from a transformation with
+        translation and a pure rotation should match.
+        """
+        position = np.zeros(2)
+
+        system = [origin2d]
+        # create a system of frames
+        for i in range(random.randint(1, 100)):
+            rotation = Rotation2d(random.random() * 2 * math.pi)
+            frame = Frame2d(position, rotation,
+                            parent_frame=random.choice(system))
+            system.append(frame)
+
+        # run comparison tests
+        for i in range(ITERS):
+            vector = np.random.random(2)
+            frame_a = random.choice(system)
+            frame_b = random.choice(system)
+            direction = Direction2d(vector, frame_a)
+
+            assert np.allclose(direction.transform_to(frame_b),
+                               frame_a.transform_to(frame_b, vector),
+                               rtol=RTOL)
 
 
 class TestDirection3d:
@@ -90,11 +139,56 @@ class TestDirection3d:
 
     def test_constructor_exception(self):
         """
-        Tests whether the constructor thows an exception if the wrong dim array
-        is passed.
+        Tests whether the constructor throws an exception if an array with the
+        wrong dimension is passed.
         """
         vector = np.random.random(random.randint(4, 100))
         frame = random_frame3d()
 
         with pytest.raises(ValueError):
             direction = Direction3d(vector, frame)      # noqa: F841
+
+    def test_transform_to_random(self):
+        """
+        Tests whether the .transform_to method with random values.
+        """
+        vector = np.random.random(3)
+        latest_frame = origin3d
+        direction = Direction3d(vector, origin3d)
+        rotated = vector
+
+        for i in range(random.randint(1, 100)):
+            frame = random_frame3d(latest_frame)
+            latest_frame = frame
+            rotated = frame.rotation.inv().apply(rotated)
+
+        assert np.allclose(direction.transform_to(latest_frame), rotated,
+                           rtol=RTOL)
+
+    def test_transform_to_compare(self):
+        """
+        Tests the .transform_to method by comparing it against .transform_to
+        from Frame3d. If all the frames are pivoting around the same point
+        (chosen to be [0, 0, 0]) then the result from a transformation with
+        translation and a pure rotation should match.
+        """
+        position = np.zeros(3)
+
+        system = [origin3d]
+        # create a system of frames
+        for i in range(random.randint(1, 100)):
+            rotation = Rotation3d.from_rotvec(np.random.random(3))
+            frame = Frame3d(position, rotation,
+                            parent_frame=random.choice(system))
+            system.append(frame)
+
+        # run comparison tests
+        for i in range(ITERS):
+            vector = np.random.random(3)
+            frame_a = random.choice(system)
+            frame_b = random.choice(system)
+            direction = Direction3d(vector, frame_a)
+
+            assert np.allclose(direction.transform_to(frame_b),
+                               frame_a.transform_to(frame_b, vector),
+                               rtol=RTOL)

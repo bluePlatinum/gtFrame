@@ -13,6 +13,8 @@ Classes:
     * Direction3d
 """
 
+from gtFrame.basic import Frame2d, Frame3d
+
 
 class Direction2d:
     """
@@ -34,6 +36,18 @@ class Direction2d:
         self.vector = vector
         self.reference = reference
 
+    def transform_to(self, reference):
+        """
+        Transform the direction vector into another frame of reference.
+
+        :param reference: the frame of reference to transform to
+        :type reference: gtFrame.basic.Frame2d
+        :return: the direction vector in the other frame of reference
+        :rtype: np.ndarray
+        """
+        path = self.reference.find_transform_path(reference)
+        return Frame2d.rotate_via_path(self.vector, path)
+
 
 class Direction3d:
     """
@@ -44,7 +58,7 @@ class Direction3d:
         reference
     :type vector: np.ndarray
     :param reference: the frame of reference on which the vector is defined
-    :type reference: gtFrame.basic.Frame2d
+    :type reference: gtFrame.basic.Frame3d
     """
     def __init__(self, vector, reference):
         """
@@ -55,3 +69,15 @@ class Direction3d:
                              "dimensional.")
         self.vector = vector
         self.reference = reference
+
+    def transform_to(self, reference):
+        """
+        Transform the direction vector into another frame of reference.
+
+        :param reference: the frame of reference to transform to
+        :type reference: gtFrame.basic.Frame3d
+        :return: the direction vector in the other frame of reference
+        :rtype: np.ndarray
+        """
+        path = self.reference.find_transform_path(reference)
+        return Frame3d.rotate_via_path(self.vector, path)
