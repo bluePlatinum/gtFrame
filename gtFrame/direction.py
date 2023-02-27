@@ -63,6 +63,15 @@ class Direction2d:
         transformed = other.transform_to(self.reference)
         return np.allclose(self.vector, transformed, rtol=self.rtol)
 
+    def length(self):
+        """
+        Returns the length (i.e. euclidean norm) of the direction vector.
+
+        :return: the euclidean norm of the direction vector
+        :rtype: float
+        """
+        return np.linalg.norm(self.vector)
+
     def transform_to(self, reference):
         """
         Transform the direction vector into another frame of reference.
@@ -120,6 +129,15 @@ class Direction3d:
 
         transformed = other.transform_to(self.reference)
         return np.allclose(self.vector, transformed, rtol=self.rtol)
+
+    def length(self):
+        """
+        Returns the length (i.e. euclidean norm) of the direction vector.
+
+        :return: the euclidean norm of the direction vector
+        :rtype: float
+        """
+        return np.linalg.norm(self.vector)
 
     def transform_to(self, reference):
         """

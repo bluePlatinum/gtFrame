@@ -110,6 +110,18 @@ class TestDirection2d:
 
             assert direction_a == direction_b
 
+    def test_length(self):
+        """
+        Tests the .length method.
+        """
+        vector = np.random.random(2)
+        frame = random_frame2d()
+        direction = Direction2d(vector, frame)
+
+        expected = np.linalg.norm(vector)
+
+        assert direction.length() == expected
+
     def test_transform_to_random(self):
         """
         Tests whether the .transform_to method with random values.
@@ -233,6 +245,18 @@ class TestDirection3d:
             direction_b = Direction3d(rotated, frame)
 
             assert direction_a == direction_b
+
+    def test_length(self):
+        """
+        Tests the .length method.
+        """
+        vector = np.random.random(3)
+        frame = random_frame3d()
+        direction = Direction3d(vector, frame)
+
+        expected = np.linalg.norm(vector)
+
+        assert direction.length() == expected
 
     def test_transform_to_compare(self):
         """
