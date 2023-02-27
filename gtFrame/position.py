@@ -13,6 +13,8 @@ Classes:
 """
 import numpy as np
 
+from gtFrame import DEFAULT_RTOL
+
 
 class Position2d:
     """
@@ -24,8 +26,12 @@ class Position2d:
     :type coordinates: np.ndarray
     :param reference: the reference in which the coordinates are defined
     :type reference: gtFrame.basic.Frame2d
+    :param rtol: The relative tolerance to be used when comparing
+        Position2d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
     """
-    def __init__(self, coordinates, reference):
+    def __init__(self, coordinates, reference, rtol=DEFAULT_RTOL):
         """
         Constructor method.
         """
@@ -34,22 +40,20 @@ class Position2d:
 
         self.coordinates = coordinates
         self.reference = reference
+        self.rtol = rtol
 
-    def __eq__(self, position, rtol=1e-12):
+    def __eq__(self, position):
         """
         Checks if two position objects point to the same point in space.
 
         :param position: a position object to check against self
         :type position: gtFrame.position.Position2d
-        :param rtol: relative tolerance for the comparison of two coordinate
-            arrays (default is 1e-12)
-        :type rtol: float
         :return: True if the two positions point to the same point in space;
             False otherwise
         :rtype: bool
         """
         other = position.transform_to(self.reference)
-        return np.allclose(self.coordinates, other, rtol=rtol)
+        return np.allclose(self.coordinates, other, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
@@ -74,8 +78,12 @@ class Position3d:
     :type coordinates: np.ndarray
     :param reference: the reference in which the coordinates are defined
     :type reference: gtFrame.basic.Frame3d
+    :param rtol: The relative tolerance to be used when comparing
+        Position3d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
     """
-    def __init__(self, coordinates, reference):
+    def __init__(self, coordinates, reference, rtol=DEFAULT_RTOL):
         """
         Constructor method.
         """
@@ -84,22 +92,20 @@ class Position3d:
 
         self.coordinates = coordinates
         self.reference = reference
+        self.rtol = rtol
 
-    def __eq__(self, position, rtol=1e-12):
+    def __eq__(self, position):
         """
         Checks if two position objects point to the same point in space.
 
         :param position: a position object to check against self
         :type position: gtFrame.position.Position3d
-        :param rtol: relative tolerance for the comparison of two coordinate
-            arrays (default is 1e-12)
-        :type rtol: float
         :return: True if the two positions point to the same point in space;
             False otherwise
         :rtype: bool
         """
         other = position.transform_to(self.reference)
-        return np.allclose(self.coordinates, other, rtol=rtol)
+        return np.allclose(self.coordinates, other, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
