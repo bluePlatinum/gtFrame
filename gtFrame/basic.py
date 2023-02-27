@@ -225,6 +225,33 @@ class Frame2d:
         """
         return self._parent
 
+    @staticmethod
+    def rotate_via_path(vector, path):
+        """
+        This function rotates a vector according to a given transform path. The
+        function works like
+        :meth:`gtFrame.basic.Frame2d.transform_via_path`, except that it only
+        rotates the vectors and does not translate them.
+
+        :param vector: the vector to be rotated
+        :type vector: np.ndarray
+        :param path: the transform path given by
+            :meth:`gtFrame.basic.Frame2d.find_transform_path`
+        :type path: list
+        :return: the rotated vector as a numpy array
+        :rtype: np.ndarray
+        """
+        rotated = vector
+        for frame, method in path:
+            if method == "from":
+                rotated = frame.rotation.apply_inverse(rotated)
+            elif method == "to":
+                rotated = frame.rotation.apply(rotated)
+            else:
+                raise ValueError("The used method was neither 'to' nor 'from'."
+                                 " The path seems to be corrupted.")
+        return rotated
+
     def transform_from_parent(self, vector):
         """
         Transform a vector, expressed in the parent frame, into this frame.
@@ -501,6 +528,33 @@ class Frame3d:
         :rtype: Frame3d
         """
         return self._parent
+
+    @staticmethod
+    def rotate_via_path(vector, path):
+        """
+        This function rotates a vector according to a given transform path. The
+        function works like
+        :meth:`gtFrame.basic.Frame3d.transform_via_path`, except that it only
+        rotates the vectors and does not translate them.
+
+        :param vector: the vector to be rotated
+        :type vector: np.ndarray
+        :param path: the transform path given by
+            :meth:`gtFrame.basic.Frame3d.find_transform_path`
+        :type path: list
+        :return: the rotated vector as a numpy array
+        :rtype: np.ndarray
+        """
+        rotated = vector
+        for frame, method in path:
+            if method == "from":
+                rotated = frame.rotation.inv().apply(rotated)
+            elif method == "to":
+                rotated = frame.rotation.apply(rotated)
+            else:
+                raise ValueError("The used method was neither 'to' nor 'from'."
+                                 " The path seems to be corrupted.")
+        return rotated
 
     def transform_from(self, frame, vector):
         """
