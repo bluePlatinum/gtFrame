@@ -90,7 +90,31 @@ class TestDirection2d:
         assert direction_a.rtol == DEFAULT_RTOL
         assert direction_b.rtol == rtol
 
-    def test_eq(self):
+    def test_eq_edgecases(self):
+        """
+        Tests the .__eq__ method with some edge cases.
+        """
+        # Testcase 1 - 0-Vector as direction
+        vector = np.zeros(2)
+        frame_a = random_frame2d()
+        frame_b = random_frame2d()
+        direction_a = Direction2d(vector, frame_a)
+        direction_b = Direction2d(vector, frame_b)
+
+        assert direction_a == direction_b
+
+        # Testcase 2 - aligned frames of reference
+        vector = np.random.random(2)
+        position = np.random.random(2)
+        rotation = Rotation2d(random.random() * 2 * math.pi)
+        frame_a = Frame2d(position, rotation, parent_frame=origin2d)
+        frame_b = Frame2d(position, rotation, parent_frame=origin2d)
+        direction_a = Direction2d(vector, frame_a)
+        direction_b = Direction2d(vector, frame_b)
+
+        assert direction_a == direction_b
+
+    def test_eq_random(self):
         """
         Tests the .__eq__ method with random values.
         """
@@ -226,7 +250,31 @@ class TestDirection3d:
         assert np.allclose(direction.transform_to(latest_frame), rotated,
                            rtol=RTOL)
 
-    def test_eq(self):
+    def test_eq_edgecases(self):
+        """
+        Tests the .__eq__ method with some edge cases.
+        """
+        # Testcase 1 - 0-Vector as direction
+        vector = np.zeros(3)
+        frame_a = random_frame3d()
+        frame_b = random_frame3d()
+        direction_a = Direction3d(vector, frame_a)
+        direction_b = Direction3d(vector, frame_b)
+
+        assert direction_a == direction_b
+
+        # Testcase 2 - aligned frames of reference
+        vector = np.random.random(3)
+        position = np.random.random(3)
+        rotation = Rotation3d.from_rotvec(np.random.random(3))
+        frame_a = Frame3d(position, rotation, parent_frame=origin3d)
+        frame_b = Frame3d(position, rotation, parent_frame=origin3d)
+        direction_a = Direction3d(vector, frame_a)
+        direction_b = Direction3d(vector, frame_b)
+
+        assert direction_a == direction_b
+
+    def test_eq_random(self):
         """
         Tests the .__eq__ method with random values.
         """

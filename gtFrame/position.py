@@ -14,6 +14,7 @@ Classes:
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
+from gtFrame.direction import Direction2d, Direction3d
 
 
 class Position2d:
@@ -54,6 +55,55 @@ class Position2d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position2d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: Position2d
+        """
+        rotated = direction.transform_to(self.reference)
+        return Position2d(self.coordinates + rotated, self.reference,
+                          rtol=self.rtol)
+
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position2d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position2d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.coordinates = self.coordinates + rotated
+
+    def get_direction(self, other):
+        """
+        Returns the direction from one position to another as a
+        :class:`gtFrame.direction.Direction2d` object. The
+        :class:`gtFrame.direction.Direction2d` object will be defined on the
+        reference of this object (i.e. self.reference)
+
+        :param other: the other position to point to
+        :type other: gtFrame.position.Position2d
+        :return: the direction from this position to 'other' as a
+            :class:`gtFrame.direction.Direction2d` object
+        :rtype: gtFrame.direction.Direction2d
+        """
+        transformed = other.transform_to(self.reference)
+        direction_vector = transformed - self.coordinates
+        return Direction2d(direction_vector, self.reference, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
@@ -106,6 +156,55 @@ class Position3d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position2d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: Position3d
+        """
+        rotated = direction.transform_to(self.reference)
+        return Position3d(self.coordinates + rotated, self.reference,
+                          rtol=self.rtol)
+
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position3d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position3d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.coordinates = self.coordinates + rotated
+
+    def get_direction(self, other):
+        """
+        Returns the direction from one position to another as a
+        :class:`gtFrame.direction.Direction3d` object. The
+        :class:`gtFrame.direction.Direction3d` object will be defined on the
+        reference of this object (i.e. self.reference)
+
+        :param other: the other position to point to
+        :type other: gtFrame.position.Position3d
+        :return: the direction from this position to 'other' as a
+            :class:`gtFrame.direction.Direction3d` object
+        :rtype: gtFrame.direction.Direction3d
+        """
+        transformed = other.transform_to(self.reference)
+        direction_vector = transformed - self.coordinates
+        return Direction3d(direction_vector, self.reference, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
