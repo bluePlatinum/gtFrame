@@ -56,6 +56,22 @@ class Position2d:
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
 
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position2d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: Position2d
+        """
+        rotated = direction.transform_to(self.reference)
+        return Position2d(self.coordinates + rotated, self.reference,
+                          rtol=self.rtol)
+
     def get_direction(self, other):
         """
         Returns the direction from one position to another as a
@@ -71,7 +87,7 @@ class Position2d:
         """
         transformed = other.transform_to(self.reference)
         direction_vector = transformed - self.coordinates
-        return Direction2d(direction_vector, self.reference)
+        return Direction2d(direction_vector, self.reference, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
@@ -125,6 +141,22 @@ class Position3d:
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
 
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position2d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: Position3d
+        """
+        rotated = direction.transform_to(self.reference)
+        return Position3d(self.coordinates + rotated, self.reference,
+                          rtol=self.rtol)
+
     def get_direction(self, other):
         """
         Returns the direction from one position to another as a
@@ -140,7 +172,7 @@ class Position3d:
         """
         transformed = other.transform_to(self.reference)
         direction_vector = transformed - self.coordinates
-        return Direction3d(direction_vector, self.reference)
+        return Direction3d(direction_vector, self.reference, rtol=self.rtol)
 
     def transform_to(self, reference):
         """
