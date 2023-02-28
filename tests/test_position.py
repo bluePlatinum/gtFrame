@@ -258,6 +258,21 @@ class TestPosition2d:
 
             assert position_a.add_direction(direction) == position_b
 
+    def test_apply_direction(self):
+        """
+        Tests the .apply_direction method by comparing it to results from
+        the .add_direction method. This test therefore relies on the validity
+        of the .add_direction method.
+        """
+        for i in range(ITERS):
+            position = random_position2d()
+            direction = random_direction2d()
+
+            expected = position.add_direction(direction)
+            position.apply_direction(direction)
+
+            assert position == expected
+
     def test_get_direction_static(self):
         """
         Tests the .get_direction method with static pre-defined testcases.
@@ -449,6 +464,21 @@ class TestPosition3d:
             direction = position_a.get_direction(position_b)
 
             assert position_a.add_direction(direction) == position_b
+
+    def test_apply_direction(self):
+        """
+        Tests the .apply_direction method by comparing it to results from
+        the .add_direction method. This test therefore relies on the validity
+        of the .add_direction method.
+        """
+        for i in range(ITERS):
+            position = random_position3d()
+            direction = random_direction3d()
+
+            expected = position.add_direction(direction)
+            position.apply_direction(direction)
+
+            assert position == expected
 
     def test_get_direction_static(self):
         """

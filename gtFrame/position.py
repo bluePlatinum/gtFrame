@@ -72,6 +72,22 @@ class Position2d:
         return Position2d(self.coordinates + rotated, self.reference,
                           rtol=self.rtol)
 
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position2d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position2d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.coordinates = self.coordinates + rotated
+
     def get_direction(self, other):
         """
         Returns the direction from one position to another as a
@@ -156,6 +172,22 @@ class Position3d:
         rotated = direction.transform_to(self.reference)
         return Position3d(self.coordinates + rotated, self.reference,
                           rtol=self.rtol)
+
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position3d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position3d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.coordinates = self.coordinates + rotated
 
     def get_direction(self, other):
         """
