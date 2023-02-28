@@ -14,6 +14,7 @@ Classes:
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
+from gtFrame.direction import Direction2d, Direction3d
 
 
 class Position2d:
@@ -54,6 +55,23 @@ class Position2d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def get_direction(self, other):
+        """
+        Returns the direction from one position to another as a
+        :class:`gtFrame.direction.Direction2d` object. The
+        :class:`gtFrame.direction.Direction2d` object will be defined on the
+        reference of this object (i.e. self.reference)
+
+        :param other: the other position to point to
+        :type other: gtFrame.position.Position2d
+        :return: the direction from this position to 'other' as a
+            :class:`gtFrame.direction.Direction2d` object
+        :rtype: gtFrame.direction.Direction2d
+        """
+        transformed = other.transform_to(self.reference)
+        direction_vector = transformed - self.coordinates
+        return Direction2d(direction_vector, self.reference)
 
     def transform_to(self, reference):
         """
@@ -106,6 +124,23 @@ class Position3d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def get_direction(self, other):
+        """
+        Returns the direction from one position to another as a
+        :class:`gtFrame.direction.Direction3d` object. The
+        :class:`gtFrame.direction.Direction3d` object will be defined on the
+        reference of this object (i.e. self.reference)
+
+        :param other: the other position to point to
+        :type other: gtFrame.position.Position3d
+        :return: the direction from this position to 'other' as a
+            :class:`gtFrame.direction.Direction3d` object
+        :rtype: gtFrame.direction.Direction3d
+        """
+        transformed = other.transform_to(self.reference)
+        direction_vector = transformed - self.coordinates
+        return Direction3d(direction_vector, self.reference)
 
     def transform_to(self, reference):
         """

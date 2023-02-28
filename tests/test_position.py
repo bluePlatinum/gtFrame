@@ -7,11 +7,16 @@ from scipy.spatial.transform import Rotation as Rotation3d
 
 from gtFrame import DEFAULT_RTOL
 from gtFrame.basic import Frame2d, Frame3d, origin2d, origin3d
+from gtFrame.direction import Direction2d, Direction3d
 from gtFrame.position import Position2d, Position3d
 from gtFrame.rotation import Rotation2d
 
 # TOLERANCES
 RTOL = 1e-12
+
+# Defines how many iterations tests should run which run multiple times.
+# ITERS
+ITERS = 10
 
 
 def random_frame2d(parent=origin2d):
@@ -137,6 +142,50 @@ class TestPosition2d:
 
         assert position_a == position_b
 
+    def test_get_direction_static(self):
+        """
+        Tests the .get_direction method with static pre-defined testcases.
+        """
+        # Testcase 1
+        position_a = Position2d(np.array([1, 1]), origin2d)
+        frame_b = Frame2d(np.array([1, 0]), Rotation2d(0), origin2d)
+        position_b = Position2d(np.array([1, 1]), frame_b)
+
+        direction = position_a.get_direction(position_b)
+        expected = Direction2d(np.array([1, 0]), origin2d)
+
+        assert np.allclose(direction.vector, expected.vector, rtol=RTOL)
+        assert direction.reference == expected.reference
+
+        # Testcase 2
+        position_a = Position2d(np.array([0, 1]), origin2d)
+        frame_b = Frame2d(np.array([0, 0]), Rotation2d(math.pi / 2))
+        position_b = Position2d(np.array([1, 0]), frame_b)
+
+        direction = position_a.get_direction(position_b)
+        expected = Direction2d(np.array([0, 0]), origin2d)
+
+        assert np.allclose(direction.vector, expected.vector, rtol=RTOL)
+        assert direction.reference == expected.reference
+
+    def test_get_direction_random(self):
+        """
+        Tests the .get_direction method with random values. The test assumes
+        that adding the direction to position_a should result in position_b.
+        Furthermore, this test assumes that the comparison between two
+        Position2d objects is valid.
+        """
+        for i in range(ITERS):
+            position_a = random_position2d()
+            position_b = random_position2d()
+
+            direction = position_a.get_direction(position_b)
+
+            control_coordinates = position_a.coordinates + direction.vector
+            control = Position2d(control_coordinates, position_a.reference)
+
+            assert position_b == control
+
     def test_transform_to(self):
         """
         Test the transform_to method.
@@ -198,6 +247,54 @@ class TestPosition3d:
 
         assert position_a.rtol == DEFAULT_RTOL
         assert position_b.rtol == rtol
+
+    def test_get_direction_static(self):
+        """
+        Tests the .get_direction method with static pre-defined testcases.
+        """
+        # Testcase 1
+        position_a = Position3d(np.array([1, 1, 0]), origin3d)
+        frame_b = Frame3d(np.array([1, 0, 0]),
+                          Rotation3d.from_rotvec(np.array([0, 0, 0])),
+                          origin3d)
+        position_b = Position3d(np.array([1, 1, 0]), frame_b)
+
+        direction = position_a.get_direction(position_b)
+        expected = Direction3d(np.array([1, 0, 0]), origin3d)
+
+        assert np.allclose(direction.vector, expected.vector, rtol=RTOL)
+        assert direction.reference == expected.reference
+
+        # Testcase 2
+        position_a = Position3d(np.array([0, 1, 0]), origin3d)
+        frame_b = Frame3d(np.array([0, 0, 0]),
+                          Rotation3d.from_rotvec(
+                              np.array([0, 0, math.pi / 2])), origin3d)
+        position_b = Position3d(np.array([1, 0, 0]), frame_b)
+
+        direction = position_a.get_direction(position_b)
+        expected = Direction3d(np.array([0, 0, 0]), origin3d)
+
+        assert np.allclose(direction.vector, expected.vector, rtol=RTOL)
+        assert direction.reference == expected.reference
+
+    def test_get_direction_random(self):
+        """
+        Tests the .get_direction method with random values. The test assumes
+        that adding the direction to position_a should result in position_b.
+        Furthermore, this test assumes that the comparison between two
+        Position3d objects is valid.
+        """
+        for i in range(ITERS):
+            position_a = random_position3d()
+            position_b = random_position3d()
+
+            direction = position_a.get_direction(position_b)
+
+            control_coordinates = position_a.coordinates + direction.vector
+            control = Position3d(control_coordinates, position_a.reference)
+
+            assert position_b == control
 
     def test_eq(self):
         """
