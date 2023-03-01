@@ -105,6 +105,18 @@ class Position2d:
         direction_vector = transformed - self.coordinates
         return Direction2d(direction_vector, self.reference, rtol=self.rtol)
 
+    def get_distance(self, other):
+        """
+        Returns the distance from one position to another.
+
+        :param other: the other position
+        :type other: gtFrame.position.Position2d
+        :return: distance to 'other' position
+        :rtype: float
+        """
+        transformed = other.transform_to(self.reference)
+        return np.linalg.norm(self.coordinates - transformed)
+
     def transform_to(self, reference):
         """
         Transform the coordinates of the vector into a desired reference.
@@ -205,6 +217,18 @@ class Position3d:
         transformed = other.transform_to(self.reference)
         direction_vector = transformed - self.coordinates
         return Direction3d(direction_vector, self.reference, rtol=self.rtol)
+
+    def get_distance(self, other):
+        """
+        Returns the distance from one position to another.
+
+        :param other: the other position
+        :type other: gtFrame.position.Position3d
+        :return: distance to 'other' position
+        :rtype: float
+        """
+        transformed = other.transform_to(self.reference)
+        return np.linalg.norm(self.coordinates - transformed)
 
     def transform_to(self, reference):
         """
