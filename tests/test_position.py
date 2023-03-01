@@ -317,6 +317,35 @@ class TestPosition2d:
 
             assert position_b == control
 
+    def test_get_distance_compare(self):
+        """
+        Tests the .get_distance method by comparing to Direction2d object
+        return from .get_direction. This test relies on the validity of the
+        .get_direction and Distance2d.length() method.
+        """
+        for i in range(ITERS):
+            position_a = random_position2d()
+            position_b = random_position2d()
+
+            expected = position_a.get_direction(position_b).length()
+
+            assert position_a.get_distance(position_b) == expected
+
+    def test_get_distance_symmetry(self):
+        """
+        Tests the .get_distance method by checking whether selection invariance
+        of two points is given. This means that
+        position_a.get_distance(position_b) is the same as
+        position_b.get_distance(position_a).
+        """
+        for i in range(ITERS):
+            position_a = random_position2d()
+            position_b = random_position2d()
+
+            assert math.isclose(position_a.get_distance(position_b),
+                                position_b.get_distance(position_a),
+                                rel_tol=RTOL)
+
     def test_transform_to(self):
         """
         Test the transform_to method.
@@ -527,6 +556,35 @@ class TestPosition3d:
             control = Position3d(control_coordinates, position_a.reference)
 
             assert position_b == control
+
+    def test_get_distance_compare(self):
+        """
+        Tests the .get_distance method by comparing to Direction3d object
+        return from .get_direction. This test relies on the validity of the
+        .get_direction and Distance2d.length() method.
+        """
+        for i in range(ITERS):
+            position_a = random_position3d()
+            position_b = random_position3d()
+
+            expected = position_a.get_direction(position_b).length()
+
+            assert position_a.get_distance(position_b) == expected
+
+    def test_get_distance_symmetry(self):
+        """
+        Tests the .get_distance method by checking whether selection invariance
+        of two points is given. This means that
+        position_a.get_distance(position_b) is the same as
+        position_b.get_distance(position_a).
+        """
+        for i in range(ITERS):
+            position_a = random_position3d()
+            position_b = random_position3d()
+
+            assert math.isclose(position_a.get_distance(position_b),
+                                position_b.get_distance(position_a),
+                                rel_tol=RTOL)
 
     def test_transform_to(self):
         """
