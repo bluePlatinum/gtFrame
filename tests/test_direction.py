@@ -134,6 +134,59 @@ class TestDirection2d:
 
             assert direction_a == direction_b
 
+    def test_mul(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.__mul__` method.
+        """
+        vector = np.random.random(2)
+        frame = random_frame2d()
+        r_tol = random.random()
+        direction = Direction2d(vector, frame, r_tol)
+
+        factor = random.random() * 10
+        scaled = direction * factor
+
+        assert np.allclose(scaled.vector, direction.vector * factor, rtol=RTOL)
+        assert scaled.reference == direction.reference
+        assert scaled.rtol == direction.rtol
+
+    def test_mul_int(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.__mul__` method with
+        integers as factors.
+        """
+        vector = np.random.random(2)
+        frame = random_frame2d()
+        r_tol = random.random()
+        direction = Direction2d(vector, frame, r_tol)
+
+        for factor in range(ITERS):
+            scaled = direction * factor
+
+            assert np.allclose(scaled.vector, direction.vector * factor,
+                               rtol=RTOL)
+            assert scaled.reference == direction.reference
+            assert scaled.rtol == direction.rtol
+
+    def test_mul_invalid(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.__mul__` method with
+        invalid values as factors.
+        """
+        inv_1 = [0.2, 2]
+        inv_2 = "hello"
+
+        vector = np.random.random(2)
+        frame = random_frame2d()
+        r_tol = random.random()
+        direction = Direction2d(vector, frame, r_tol)
+
+        with pytest.raises(TypeError):
+            direction * inv_1
+
+        with pytest.raises(ValueError):
+            direction * inv_2
+
     def test_length(self):
         """
         Tests the .length method.
@@ -293,6 +346,59 @@ class TestDirection3d:
             direction_b = Direction3d(rotated, frame)
 
             assert direction_a == direction_b
+
+    def test_mul(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction3d.__mul__` method.
+        """
+        vector = np.random.random(3)
+        frame = random_frame3d()
+        r_tol = random.random()
+        direction = Direction3d(vector, frame, r_tol)
+
+        factor = random.random() * 10
+        scaled = direction * factor
+
+        assert np.allclose(scaled.vector, direction.vector * factor, rtol=RTOL)
+        assert scaled.reference == direction.reference
+        assert scaled.rtol == direction.rtol
+
+    def test_mul_int(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction3d.__mul__` method with
+        integers as factors.
+        """
+        vector = np.random.random(3)
+        frame = random_frame3d()
+        r_tol = random.random()
+        direction = Direction3d(vector, frame, r_tol)
+
+        for factor in range(ITERS):
+            scaled = direction * factor
+
+            assert np.allclose(scaled.vector, direction.vector * factor,
+                               rtol=RTOL)
+            assert scaled.reference == direction.reference
+            assert scaled.rtol == direction.rtol
+
+    def test_mul_invalid(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction3d.__mul__` method with
+        invalid values as factors.
+        """
+        inv_1 = [0.2, 2]
+        inv_2 = "hello"
+
+        vector = np.random.random(3)
+        frame = random_frame3d()
+        r_tol = random.random()
+        direction = Direction3d(vector, frame, r_tol)
+
+        with pytest.raises(TypeError):
+            direction * inv_1
+
+        with pytest.raises(ValueError):
+            direction * inv_2
 
     def test_length(self):
         """

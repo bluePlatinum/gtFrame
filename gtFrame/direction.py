@@ -63,6 +63,27 @@ class Direction2d:
         transformed = other.transform_to(self.reference)
         return np.allclose(self.vector, transformed, rtol=self.rtol)
 
+    def __mul__(self, other):
+        """
+        Scales the direction vector by an amount given by 'other' and returns
+        a new Direction2d object with the scaled vector.
+
+        :param other: the scaling factor for the direction vector
+        :type other: float
+        :return: a new Direction2d object with the scaled vector
+        :rtype: Direction2d
+        """
+        try:
+            factor = float(other)
+        except ValueError:
+            raise ValueError("A Direction2d object can only be scaled "
+                             "with a number.")
+        except TypeError:
+            raise TypeError("A Direction2d object can only be scaled "
+                            "with a number.")
+
+        return Direction2d(self.vector * factor, self.reference, self.rtol)
+
     def length(self):
         """
         Returns the length (i.e. euclidean norm) of the direction vector.
@@ -129,6 +150,27 @@ class Direction3d:
 
         transformed = other.transform_to(self.reference)
         return np.allclose(self.vector, transformed, rtol=self.rtol)
+
+    def __mul__(self, other):
+        """
+        Scales the direction vector by an amount given by 'other' and returns
+        a new Direction3d object with the scaled vector.
+
+        :param other: the scaling factor for the direction vector
+        :type other: float
+        :return: a new Direction2d object with the scaled vector
+        :rtype: Direction3d
+        """
+        try:
+            factor = float(other)
+        except ValueError:
+            raise ValueError("A Direction3d object can only be scaled "
+                             "with a number.")
+        except TypeError:
+            raise TypeError("A Direction3d object can only be scaled "
+                            "with a number.")
+
+        return Direction3d(self.vector * factor, self.reference, self.rtol)
 
     def length(self):
         """
