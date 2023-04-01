@@ -188,6 +188,45 @@ class TestDirection2d:
         with pytest.raises(ValueError):
             direction * inv_2
 
+    def test_apply_direction_static(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.apply_direction` method
+        with static pre-defined test cases.
+        """
+        # testcase 1
+        direction_1 = Direction2d(np.array([1, 1], dtype=np.float64), origin2d)
+        frame = Frame2d(np.zeros(2), Rotation2d(- math.pi / 2),
+                        parent_frame=origin2d)
+        direction_2 = Direction2d(np.array([1, 0], dtype=np.float64), frame)
+        expected = np.array([1, 0], dtype=np.float64)
+
+        direction_1.apply_direction(direction_2)
+        assert np.allclose(direction_1.vector, expected, rtol=RTOL)
+
+        # testcase 2
+        direction_1 = Direction2d(np.array([0, 1], dtype=np.float64), origin2d)
+        frame = Frame2d(np.zeros(2), Rotation2d(math.pi / 2))
+        direction_2 = Direction2d(np.array([1, 0], dtype=np.float64), frame)
+        expected = np.array([0, 2], dtype=np.float64)
+
+        direction_1.apply_direction(direction_2)
+        assert np.allclose(direction_1.vector, expected, rtol=RTOL)
+
+    def test_apply_direction_random(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.apply_direction` method
+        with randomly generated values.
+        """
+        for _ in range(ITERS):
+            direction_1 = Direction2d(np.random.random(2), origin2d)
+            rotation = Rotation2d(random.random() * 2 * math.pi)
+            frame = Frame2d(np.random.random(2), rotation)
+            direction_2 = Direction2d(np.random.random(2), frame)
+
+            expected = direction_1.vector + rotation.apply(direction_2.vector)
+            direction_1.apply_direction(direction_2)
+            assert np.allclose(direction_1.vector, expected, rtol=RTOL)
+
     def test_length(self):
         """
         Tests the .length method.
@@ -450,6 +489,49 @@ class TestDirection3d:
 
         with pytest.raises(ValueError):
             direction * inv_2
+
+    def test_apply_direction_static(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.apply_direction` method
+        with static pre-defined test cases.
+        """
+        # testcase 1
+        direction_1 = Direction3d(np.array([1, 1, 0], dtype=np.float64),
+                                  origin3d)
+        frame = Frame3d(np.zeros(3),
+                        Rotation3d.from_rotvec([0, 0, - math.pi / 2]),
+                        parent_frame=origin3d)
+        direction_2 = Direction3d(np.array([1, 0, 0], dtype=np.float64), frame)
+        expected = np.array([1, 0, 0], dtype=np.float64)
+
+        direction_1.apply_direction(direction_2)
+        assert np.allclose(direction_1.vector, expected, rtol=RTOL)
+
+        # testcase 2
+        direction_1 = Direction3d(np.array([0, 1, 0], dtype=np.float64),
+                                  origin3d)
+        frame = Frame3d(np.zeros(3),
+                        Rotation3d.from_rotvec([0, 0, math.pi / 2]))
+        direction_2 = Direction3d(np.array([1, 0, 0], dtype=np.float64), frame)
+        expected = np.array([0, 2, 0], dtype=np.float64)
+
+        direction_1.apply_direction(direction_2)
+        assert np.allclose(direction_1.vector, expected, rtol=RTOL)
+
+    def test_apply_direction_random(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.apply_direction` method
+        with randomly generated values.
+        """
+        for _ in range(ITERS):
+            direction_1 = Direction3d(np.random.random(3), origin3d)
+            rotation = Rotation3d.from_rotvec(np.random.random(3))
+            frame = Frame3d(np.random.random(3), rotation)
+            direction_2 = Direction3d(np.random.random(3), frame)
+
+            expected = direction_1.vector + rotation.apply(direction_2.vector)
+            direction_1.apply_direction(direction_2)
+            assert np.allclose(direction_1.vector, expected, rtol=RTOL)
 
     def test_length(self):
         """

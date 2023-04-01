@@ -84,6 +84,18 @@ class Direction2d:
 
         return Direction2d(self.vector * factor, self.reference, self.rtol)
 
+    def apply_direction(self, direction):
+        """
+        Adds the vector of 'direction' to the vector of self, after
+        transforming it in to self.reference.
+
+        :param direction: the Direction2d object to be applied to this one
+        :type direction: Direction2d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.vector = self.vector + rotated
+
     def length(self):
         """
         Returns the length (i.e. euclidean norm) of the direction vector.
@@ -190,6 +202,18 @@ class Direction3d:
                             "with a number.")
 
         return Direction3d(self.vector * factor, self.reference, self.rtol)
+
+    def apply_direction(self, direction):
+        """
+        Adds the vector of 'direction' to the vector of self, after
+        transforming it in to self.reference.
+
+        :param direction: the Direction3d object to be applied to this one
+        :type direction: Direction3d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.vector = self.vector + rotated
 
     def length(self):
         """
