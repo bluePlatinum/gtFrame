@@ -91,6 +91,36 @@ class TestDirection2d:
         assert direction_a.rtol == DEFAULT_RTOL
         assert direction_b.rtol == rtol
 
+    def test_add(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.__add__` method.
+        """
+        frame = Frame2d(np.random.random(2), Rotation2d(random.random()))
+        direction_a = Direction2d(np.random.random(2), frame)
+        direction_b = Direction2d(np.random.random(2), frame)
+
+        result = direction_a + direction_b
+        direction_a.apply_direction(direction_b)
+
+        assert np.allclose(result.vector, direction_a.vector, rtol=RTOL)
+        assert direction_a.reference == result.reference
+        assert direction_a.rtol == result.rtol
+
+    def test_add_type(self):
+        """
+        Tests whether the :meth:`gtFrame.direction.Direction2d._add__` method
+        checks for class/variable type.
+        """
+        direction = Direction2d(np.random.random(2), origin2d)
+
+        with pytest.raises(TypeError):
+            direction + 1
+        with pytest.raises(TypeError):
+            direction + "1"
+        with pytest.raises(TypeError):
+            frame = Frame2d(np.random.random(2), Rotation2d(random.random()))
+            direction + frame
+
     def test_eq_edgecases(self):
         """
         Tests the .__eq__ method with some edge cases.
@@ -392,6 +422,38 @@ class TestDirection3d:
 
         assert np.allclose(direction.transform_to(latest_frame), rotated,
                            rtol=RTOL)
+
+    def test_add(self):
+        """
+        Tests the :meth:`gtFrame.direction.Direction2d.__add__` method.
+        """
+        frame = Frame3d(np.random.random(3),
+                        Rotation3d.from_rotvec(np.random.random(3)))
+        direction_a = Direction3d(np.random.random(3), frame)
+        direction_b = Direction3d(np.random.random(3), frame)
+
+        result = direction_a + direction_b
+        direction_a.apply_direction(direction_b)
+
+        assert np.allclose(result.vector, direction_a.vector, rtol=RTOL)
+        assert direction_a.reference == result.reference
+        assert direction_a.rtol == result.rtol
+
+    def test_add_type(self):
+        """
+        Tests whether the :meth:`gtFrame.direction.Direction3d._add__` method
+        checks for class/variable type.
+        """
+        direction = Direction3d(np.random.random(3), origin3d)
+
+        with pytest.raises(TypeError):
+            direction + 1
+        with pytest.raises(TypeError):
+            direction + "1"
+        with pytest.raises(TypeError):
+            frame = Frame3d(np.random.random(3),
+                            Rotation3d.from_rotvec(np.random.random(3)))
+            direction + frame
 
     def test_eq_edgecases(self):
         """
