@@ -93,6 +93,25 @@ class Direction2d:
         """
         return np.linalg.norm(self.vector)
 
+    def scale(self, factor):
+        """
+        Scales the length of the direction vector, by multiplying it with a
+        factor.
+
+        :param factor: the factor for scaling the vector
+        :type factor: float
+        :return: None
+        """
+        try:
+            factor = float(factor)
+        except ValueError:
+            raise ValueError("A Direction2d object can only be scaled "
+                             "with a number.")
+        except TypeError:
+            raise TypeError("A Direction2d object can only be scaled "
+                            "with a number.")
+        self.vector = self.vector * factor
+
     def transform_to(self, reference):
         """
         Transform the direction vector into another frame of reference.
@@ -180,6 +199,25 @@ class Direction3d:
         :rtype: float
         """
         return np.linalg.norm(self.vector)
+
+    def scale(self, factor):
+        """
+        Scales the length of the direction vector, by multiplying it with a
+        factor.
+
+        :param factor: the factor for scaling the vector
+        :type factor: float
+        :return: None
+        """
+        try:
+            factor = float(factor)
+        except ValueError:
+            raise ValueError("A Direction3d object can only be scaled "
+                             "with a number.")
+        except TypeError:
+            raise TypeError("A Direction3d object can only be scaled "
+                            "with a number.")
+        self.vector = self.vector * factor
 
     def transform_to(self, reference):
         """
