@@ -13,6 +13,7 @@ Classes:
     * Direction3d
 """
 
+import copy
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
@@ -43,6 +44,24 @@ class Direction2d:
         self.vector = vector
         self.reference = reference
         self.rtol = rtol
+
+    def __add__(self, other):
+        """
+        Adds the other Direction objects vector to self.vector and returns a
+        new Direction2d object with the resulting vector.
+
+        :param other: Direction2d object to add
+        :type other: Direction2d
+        :return: the resulting Direction2d object
+        :rtype: Direction2d
+        """
+        if type(other).__name__ != "Direction2d":
+            raise TypeError("Direction2d objects can only be summed with other"
+                            "Direction2d objects")
+
+        direction = copy.copy(self)
+        direction.apply_direction(other)
+        return direction
 
     def __eq__(self, other):
         """
@@ -162,6 +181,24 @@ class Direction3d:
         self.vector = vector
         self.reference = reference
         self.rtol = rtol
+
+    def __add__(self, other):
+        """
+        Adds the other Direction objects vector to self.vector and returns a
+        new Direction2d object with the resulting vector.
+
+        :param other: Direction3d object to add
+        :type other: Direction3d
+        :return: the resulting Direction3d object
+        :rtype: Direction3d
+        """
+        if type(other).__name__ != "Direction3d":
+            raise TypeError("Direction3d objects can only be summed with other"
+                            "Direction3d objects")
+
+        direction = copy.copy(self)
+        direction.apply_direction(other)
+        return direction
 
     def __eq__(self, other):
         """
