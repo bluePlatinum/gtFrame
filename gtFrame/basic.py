@@ -52,6 +52,15 @@ class RootFrame2d:
 
         return path[::-1]      # path is generated in reverse
 
+    def parent(self):
+        """
+        Returns the parent of the Frame. For RootFrame2d this is self.
+
+        :return: self
+        :rtype: RootFrame2d
+        """
+        return self
+
     def transform_from(self, frame, vector):
         """
         Transform a vector expressed in an arbitrary frame of reference into
@@ -360,6 +369,15 @@ class RootFrame3d:
             current_frame = current_frame.parent()
 
         return path[::-1]      # path is generated in reverse
+
+    def parent(self):
+        """
+        Returns the parent of the Frame. For RootFrame3d this is self.
+
+        :return: self
+        :rtype: RootFrame3d
+        """
+        return self
 
     def transform_from(self, frame, vector):
         """
