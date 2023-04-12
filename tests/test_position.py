@@ -1,3 +1,4 @@
+import copy
 import math
 import random
 
@@ -7,7 +8,9 @@ from scipy.spatial.transform import Rotation as Rotation3d
 
 from gtFrame import DEFAULT_RTOL
 from gtFrame.basic import Frame2d, Frame3d, origin2d, origin3d
+from gtFrame.basic import RootFrame2d, RootFrame3d
 from gtFrame.direction import Direction2d, Direction3d
+from gtFrame.position import BoundPosition2d, BoundPosition3d
 from gtFrame.position import Position2d, Position3d
 from gtFrame.rotation import Rotation2d
 
@@ -95,6 +98,40 @@ def random_frame3d(parent=origin3d):
     return Frame3d(position, rotation, parent_frame=parent)
 
 
+def random_boundposition2d(coordinates=None, reference=None):
+    """
+    Generates a random BoundPosition2d object with random values.
+
+    :param coordinates: override random coordinates assigned to object
+    :type coordinates: np.ndarray
+    :param reference: override random reference assigned to object
+    :type reference: gtFrame.basic.Frame2d
+    """
+    if coordinates is None:
+        coordinates = np.random.random(2)
+    if reference is None:
+        reference = random_frame2d()
+
+    return BoundPosition2d(coordinates, reference)
+
+
+def random_boundposition3d(coordinates=None, reference=None):
+    """
+    Generates a random BoundPosition3d object with random values.
+
+    :param coordinates: override random coordinates assigned to object
+    :type coordinates: np.ndarray
+    :param reference: override random reference assigned to object
+    :type reference: gtFrame.basic.Frame3d
+    """
+    if coordinates is None:
+        coordinates = np.random.random(3)
+    if reference is None:
+        reference = random_frame3d()
+
+    return BoundPosition3d(coordinates, reference)
+
+
 def random_position2d(coordinates=None, reference=None):
     """
     Generates a random Position2d object with random values.
@@ -127,6 +164,202 @@ def random_position3d(coordinates=None, reference=None):
         reference = random_frame3d()
 
     return Position3d(coordinates, reference)
+
+
+class TestBoundPosition2d:
+    """
+    Holds tests for BoundPosition2d
+    """
+    def test_constructor_assign(self):
+        """
+        Tests whether the constructor correctly assigns the attributes.
+
+        :return: None
+        """
+        coordinates = np.random.random(2)
+        frame = random_frame2d()
+
+        position = BoundPosition2d(coordinates, frame)
+
+        assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+        assert position.reference == frame
+
+    def test_constructor_exception_coordinates(self):
+        """
+        Tests whether the constructor raises an error if the wrong dimension
+        vector is passed.
+
+        :return: None
+        """
+        coordinates = np.random.random(random.randint(3, 100))
+        frame = random_frame2d()
+
+        with pytest.raises(ValueError):
+            position = BoundPosition2d(coordinates, frame)       # noqa: F841
+
+    def test_construction_exception_reference(self):
+        """
+        Tests whether the constructor raises an error if a RootFrame2d is
+        passed as a reference.
+        """
+        coordinates = np.random.random(2)
+        frame = RootFrame2d()
+
+        with pytest.raises(TypeError):
+            BoundPosition2d(coordinates, frame)
+
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of the rtol attribute on init.
+        """
+        coordinates = np.random.random(2)
+        frame = random_frame2d()
+        rtol = random.random()
+
+        position_a = BoundPosition2d(coordinates, frame)
+        position_b = BoundPosition2d(coordinates, frame, rtol=rtol)
+
+        assert position_a.rtol == DEFAULT_RTOL
+        assert position_b.rtol == rtol
+
+    def test_eq(self):
+        """
+        Tests the == operator (i.e. the __eq__ method).
+
+        :return: None
+        """
+        coordinates = np.random.random(2)
+        frame_a = random_frame2d()
+        frame_b = random_frame2d()
+
+        position_a = BoundPosition2d(coordinates, frame_a)
+        position_b = BoundPosition2d(frame_b.transform_from(frame_a,
+                                                            coordinates),
+                                     frame_b)
+
+        assert position_a == position_b
+
+    def test_eq_agnostic(self):
+        """
+        Test the == operator with agnostic Position types. So compare Position
+        with BoundPosition.
+        """
+        coordinates = np.random.random(2)
+        frame_a = random_frame2d()
+        frame_b = random_frame2d()
+
+        position_a = Position2d(coordinates, frame_a)
+        position_b = BoundPosition2d(frame_b.transform_from(frame_a,
+                                                            coordinates),
+                                     frame_b)
+
+        assert position_a == position_b
+
+    def test_add_direction_static(self):
+        """
+        Tests the .add_direction method with static testcases. This test
+        assumes that the comparison between Position2d objects is valid.
+        """
+        # Testcase 1 - 0-Direction
+        frame = Frame2d(np.zeros(2), Rotation2d(0), origin2d)
+        position = BoundPosition2d(np.random.random(2), frame)
+        direction = Direction2d(np.zeros(2), origin2d)
+
+        result = position.add_direction(direction)
+        expected = Position2d(position.coordinates, origin2d)
+
+        assert result == expected
+
+        # Testcase 2
+        frame = Frame2d(np.zeros(2), Rotation2d(0), origin2d)
+        position = BoundPosition2d(np.array([0, 1]), frame)
+        dir_frame = Frame2d(np.zeros(2), Rotation2d(math.pi / 2), origin2d)
+        direction = Direction2d(np.array([0, 1]), dir_frame)
+
+        result = position.add_direction(direction)
+        expected = Position2d(np.array([-1, 1]), origin2d)
+        expected_frame_pos = np.array([-1, 0], dtype=np.float64)
+
+        assert result == expected
+        assert np.allclose(result.reference.position, expected_frame_pos,
+                           rtol=RTOL)
+
+    def test_add_direction_inheritance(self):
+        """
+        Tests whether the returned objects from .add_direction method inherit
+        the reference and rtol from the calling object.
+        """
+        frame = random_frame2d()
+        position = BoundPosition2d(np.random.random(2), frame,
+                                   rtol=random.random())
+        direction = random_direction2d()
+
+        result = position.add_direction(direction)
+
+        assert result.reference == position.reference
+        assert result.rtol == position.rtol
+
+    def test_add_direction_random(self):
+        """
+        Tests the .add_direction method with random values.
+        """
+        for i in range(ITERS):
+            reference = random_frame2d()
+            copy_reference = copy.deepcopy(reference)
+            copy_reference._parent = origin2d
+            position = random_boundposition2d(reference=copy_reference)
+            direction = random_direction2d()
+
+            result = position.add_direction(direction)
+
+            transformed = direction.transform_to(reference)
+            expected_coordinates = position.coordinates + transformed
+            expected = Position2d(expected_coordinates, reference)
+
+            assert result == expected
+
+    def test_add_direction_reversible(self):
+        """
+        Tests whether adding the direction gained from .get_direction method
+        results in the other position coordinates. This test relies on the
+        validity of .get_direction.
+        """
+        for i in range(ITERS):
+            position_a = random_boundposition2d()
+            position_b = random_boundposition2d()
+
+            direction = position_a.get_direction(position_b)
+
+            assert position_a.add_direction(direction) == position_b
+
+    def test_add_direction_sanity_check(self):
+        """
+        Assures that the :meth:`gtFrame.position.BoundPosition2d` only alters
+        the reference position and does not alter the coordinates.
+        """
+        for i in range(ITERS):
+            position = random_boundposition2d()
+            coordinates = position.coordinates
+            direction = random_direction2d()
+
+            result = position.add_direction(direction)      # noqa: F841
+
+            assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+
+    def test_apply_direction(self):
+        """
+        Tests the .apply_direction method by comparing it to results from
+        the .add_direction method. This test therefore relies on the validity
+        of the .add_direction method.
+        """
+        for i in range(ITERS):
+            position = random_boundposition2d()
+            direction = random_direction2d()
+
+            expected = position.add_direction(direction)
+            position.apply_direction(direction)
+
+            assert position == expected
 
 
 class TestPosition2d:
@@ -361,6 +594,204 @@ class TestPosition2d:
         expected = foreign_frame.transform_from(frame, coordinates)
 
         assert np.allclose(transformed, expected, rtol=RTOL)
+
+
+class TestBoundPosition3d:
+    """
+    Holds tests for BoundPosition3d
+    """
+    def test_constructor_assign(self):
+        """
+        Tests whether the constructor correctly assigns the attributes.
+
+        :return: None
+        """
+        coordinates = np.random.random(3)
+        frame = random_frame3d()
+
+        position = BoundPosition3d(coordinates, frame)
+
+        assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+        assert position.reference == frame
+
+    def test_constructor_exception_coordinates(self):
+        """
+        Tests whether the constructor raises an error if the wrong dimension
+        vector is passed.
+
+        :return: None
+        """
+        coordinates = np.random.random(random.randint(3, 100))
+        frame = random_frame3d()
+
+        with pytest.raises(ValueError):
+            position = BoundPosition3d(coordinates, frame)       # noqa: F841
+
+    def test_construction_exception_reference(self):
+        """
+        Tests whether the constructor raises an error if a RootFrame2d is
+        passed as a reference.
+        """
+        coordinates = np.random.random(3)
+        frame = RootFrame3d()
+
+        with pytest.raises(TypeError):
+            BoundPosition3d(coordinates, frame)
+
+    def test_constructor_tolerances(self):
+        """
+        Test the assignment of the rtol attribute on init.
+        """
+        coordinates = np.random.random(3)
+        frame = random_frame3d()
+        rtol = random.random()
+
+        position_a = BoundPosition3d(coordinates, frame)
+        position_b = BoundPosition3d(coordinates, frame, rtol=rtol)
+
+        assert position_a.rtol == DEFAULT_RTOL
+        assert position_b.rtol == rtol
+
+    def test_eq(self):
+        """
+        Tests the == operator (i.e. the __eq__ method).
+
+        :return: None
+        """
+        coordinates = np.random.random(3)
+        frame_a = random_frame3d()
+        frame_b = random_frame3d()
+
+        position_a = BoundPosition3d(coordinates, frame_a)
+        position_b = BoundPosition3d(frame_b.transform_from(frame_a,
+                                                            coordinates),
+                                     frame_b)
+
+        assert position_a == position_b
+
+    def test_eq_agnostic(self):
+        """
+        Test the == operator with agnostic Position types. So compare Position
+        with BoundPosition.
+        """
+        coordinates = np.random.random(3)
+        frame_a = random_frame3d()
+        frame_b = random_frame3d()
+
+        position_a = Position3d(coordinates, frame_a)
+        position_b = BoundPosition3d(frame_b.transform_from(frame_a,
+                                                            coordinates),
+                                     frame_b)
+
+        assert position_a == position_b
+
+    def test_add_direction_static(self):
+        """
+        Tests the .add_direction method with static testcases. This test
+        assumes that the comparison between Position3d objects is valid.
+        """
+        # Testcase 1 - 0-Direction
+        frame = Frame3d(np.zeros(3), Rotation3d.from_rotvec([0, 0, 0]),
+                        parent_frame=origin3d)
+        position = BoundPosition3d(np.random.random(3), frame)
+        direction = Direction3d(np.zeros(3), origin3d)
+
+        result = position.add_direction(direction)
+        expected = Position3d(position.coordinates, origin3d)
+
+        assert result == expected
+
+        # Testcase 2
+        frame = Frame3d(np.zeros(3), Rotation3d.from_rotvec([0, 0, 0]),
+                        parent_frame=origin3d)
+        position = BoundPosition3d(np.array([0, 1, 0]), frame)
+        dir_frame = Frame3d(np.zeros(3),
+                            Rotation3d.from_rotvec(
+                                np.array([0, 0, math.pi / 2])),
+                            origin3d)
+        direction = Direction3d(np.array([0, 1, 0]), dir_frame)
+
+        result = position.add_direction(direction)
+        expected = Position3d(np.array([-1, 1, 0]), origin3d)
+
+        assert result == expected
+
+    def test_add_direction_inheritance(self):
+        """
+        Tests whether the returned objects from .add_direction method inherit
+        the reference and rtol from the calling object.
+        """
+        frame = random_frame3d()
+        position = BoundPosition3d(np.random.random(3), frame,
+                                   rtol=random.random())
+        direction = random_direction3d()
+
+        result = position.add_direction(direction)
+
+        assert result.reference == position.reference
+        assert result.rtol == position.rtol
+
+    def test_add_direction_random(self):
+        """
+        Tests the .add_direction method with random values.
+        """
+        for i in range(ITERS):
+            reference = random_frame3d()
+            copy_reference = copy.deepcopy(reference)
+            copy_reference._parent = origin3d
+            position = random_boundposition3d(reference=copy_reference)
+            direction = random_direction3d()
+
+            result = position.add_direction(direction)
+
+            transformed = direction.transform_to(reference)
+            expected_coordinates = position.coordinates + transformed
+            expected = Position3d(expected_coordinates, reference)
+
+            assert result == expected
+
+    def test_add_direction_reversible(self):
+        """
+        Tests whether adding the direction gained from .get_direction method
+        results in the other position coordinates. This test relies on the
+        validity of .get_direction.
+        """
+        for i in range(ITERS):
+            position_a = random_boundposition3d()
+            position_b = random_boundposition3d()
+
+            direction = position_a.get_direction(position_b)
+
+            assert position_a.add_direction(direction) == position_b
+
+    def test_add_direction_sanity_check(self):
+        """
+        Assures that the :meth:`gtFrame.position.BoundPosition2d` only alters
+        the reference position and does not alter the coordinates.
+        """
+        for i in range(ITERS):
+            position = random_boundposition3d()
+            coordinates = position.coordinates
+            direction = random_direction3d()
+
+            result = position.add_direction(direction)  # noqa: F841
+
+            assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+
+    def test_apply_direction(self):
+        """
+        Tests the .apply_direction method by comparing it to results from
+        the .add_direction method. This test therefore relies on the validity
+        of the .add_direction method.
+        """
+        for i in range(ITERS):
+            position = random_boundposition3d()
+            direction = random_direction3d()
+
+            expected = position.add_direction(direction)
+            position.apply_direction(direction)
+
+            assert position == expected
 
 
 class TestPosition3d:

@@ -14,6 +14,7 @@ Classes:
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
+from gtFrame.basic import RootFrame2d, RootFrame3d
 from gtFrame.direction import Direction2d, Direction3d
 
 
@@ -130,6 +131,67 @@ class Position2d:
         return self.reference.transform_to(reference, self.coordinates)
 
 
+class BoundPosition2d(Position2d):
+    """
+    This is a wrapper class for Position2d. It has the same functionality as
+    :class:`gtFrame.position.BoundPosition2d`, only that the frame is bound to
+    the position and gets updated instead of the coordinates.
+
+    :param coordinates: the coordinates of the 2d-vector representing a point
+        in space
+    :type coordinates: np.ndarray
+    :param reference: the reference in which the coordinates are defined
+    :type reference: gtFrame.basic.Frame2d
+    :param rtol: The relative tolerance to be used when comparing
+        Position2d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
+    """
+    def __init__(self, coordinates, reference, rtol=DEFAULT_RTOL):
+        """
+        Constructor method.
+        """
+        if isinstance(reference, RootFrame2d):
+            raise TypeError("BoundPosition2d cannot take RootFrame2d as "
+                            "reference")
+
+        super().__init__(coordinates, reference, rtol)
+
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position2d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: BoundPosition2d
+        """
+        rotated = direction.transform_to(self.reference.parent())
+        new = BoundPosition2d(self.coordinates, self.reference,
+                              rtol=self.rtol)
+        new.reference.position += rotated
+        return new
+
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position2d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position2d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction2d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.reference.position = self.reference.position + rotated
+
+
 class Position3d:
     """
     This class holds the coordinates of a 3d vector in a numpy array and the
@@ -241,3 +303,64 @@ class Position3d:
         :rtype: np.ndarray
         """
         return self.reference.transform_to(reference, self.coordinates)
+
+
+class BoundPosition3d(Position3d):
+    """
+    This is a wrapper class for Position3d. It has the same functionality as
+    :class:`gtFrame.position.BoundPosition3d`, only that the frame is bound to
+    the position and gets updated instead of the coordinates.
+
+    :param coordinates: the coordinates of the 3d-vector representing a point
+        in space
+    :type coordinates: np.ndarray
+    :param reference: the reference in which the coordinates are defined
+    :type reference: gtFrame.basic.Frame3d
+    :param rtol: The relative tolerance to be used when comparing
+        Position3d objects. The default is set to the global variable
+        DEFAULT_RTOL.
+    :type rtol: float
+    """
+    def __init__(self, coordinates, reference, rtol=DEFAULT_RTOL):
+        """
+        Constructor method.
+        """
+        if isinstance(reference, RootFrame3d):
+            raise TypeError("BoundPosition3d cannot take RootFrame3d as "
+                            "reference")
+
+        super().__init__(coordinates, reference, rtol)
+
+    def add_direction(self, direction):
+        """
+        Returns the point that results in adding a direction vector to this
+        point.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: The resulting point from the addition with a direction vector.
+            The returned Position3d object will inherit the reference and rtol
+            of this (self) object.
+        :rtype: BoundPosition3d
+        """
+        rotated = direction.transform_to(self.reference.parent())
+        new = BoundPosition3d(self.coordinates, self.reference,
+                              rtol=self.rtol)
+        new.reference.position += rotated
+        return new
+
+    def apply_direction(self, direction):
+        """
+        Adds a given direction vector to this Position3d object. This results
+        in the same point as would be returned by the .add_direction method.
+        The difference is that .apply_direction applies the changes to the
+        coordinates from this object, while .add_direction creates a new
+        :class:`gtFrame.direction.Position3d` object with the modified
+        coordinates.
+
+        :param direction: a direction vector to be added to the point
+        :type direction: gtFrame.direction.Direction3d
+        :return: None
+        """
+        rotated = direction.transform_to(self.reference)
+        self.reference.position = self.reference.position + rotated
