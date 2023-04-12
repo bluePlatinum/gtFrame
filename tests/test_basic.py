@@ -222,6 +222,14 @@ class TestRootFrame2d:
         assert expected6 == origin2d.find_transform_path(frame6)
         assert expected7 == origin2d.find_transform_path(frame7)
 
+    def test_parent(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame2d.parent` method.
+        """
+        frame = RootFrame2d()
+
+        assert frame.parent() == frame
+
     def test_transform_from(self, frame2d_system):
         """
         Test the .transform_from method with random vectors and random paths.
@@ -772,6 +780,14 @@ class TestRootFrame3d:
         assert expected5 == origin3d.find_transform_path(frame5)
         assert expected6 == origin3d.find_transform_path(frame6)
         assert expected7 == origin3d.find_transform_path(frame7)
+
+    def test_parent(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame3d.parent` method.
+        """
+        frame = RootFrame3d()
+
+        assert frame.parent() == frame
 
     def test_transform_from(self, frame3d_system):
         """
