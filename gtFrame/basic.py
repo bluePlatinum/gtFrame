@@ -34,6 +34,18 @@ class RootFrame2d:
         self.position = np.array([0, 0], dtype=np.float64)
         self.rotation = gtFrame.rotation.Rotation2d(0)
 
+    def __deepcopy__(self, memo):
+        """
+        The deepcopy method for RootFrame2d just returns itself, as is does not
+        make any sense to copy a root frame.
+
+        :param memo: required memo argument
+        :type memo: dict
+        :return: the deepcopy of RootFrame2d, which is just self
+        :rtype: RootFrame2d
+        """
+        return self
+
     def find_transform_path(self, frame):
         """
         Finds the transform path from this frame of reference to the given
@@ -351,6 +363,18 @@ class RootFrame3d:
         self.rotation = Rotation3d.from_euler('xyz', np.array(
                                                         [0, 0, 0],
                                                         dtype=np.float64))
+
+    def __deepcopy__(self, memo):
+        """
+        The deepcopy method for RootFrame3d just returns itself, as is does not
+        make any sense to copy a root frame.
+
+        :param memo: required memo argument
+        :type memo: dict
+        :return: the deepcopy of RootFrame3d, which is just self
+        :rtype: RootFrame3d
+        """
+        return self
 
     def find_transform_path(self, frame):
         """

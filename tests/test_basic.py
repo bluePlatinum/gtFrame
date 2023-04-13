@@ -1,6 +1,7 @@
 """
 Tests for the :mod:`gtFrame.basic` module.
 """
+import copy
 import math
 import random
 
@@ -15,6 +16,8 @@ from gtFrame.basic import origin2d
 from gtFrame.basic import origin3d
 from gtFrame.basic import RootFrame2d
 from gtFrame.basic import RootFrame3d
+from gtFrame.position import Position2d
+from gtFrame.position import Position3d
 from gtFrame.rotation import Rotation2d
 
 # TOLERANCES
@@ -189,6 +192,32 @@ class TestRootFrame2d:
 
         assert np.allclose(root_frame.position, np.array([0, 0]), rtol=RTOL)
         assert root_frame.rotation.as_rad() == 0
+
+    def test_deepcopy_simple(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame2d.__deepcopy__` method with a
+        simple `copy.deepcopy()` call.
+
+        :return: None
+        """
+        root_frame = RootFrame2d()
+
+        assert copy.deepcopy(root_frame) == root_frame
+
+    def test_deepcopy_nested(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame2d.__deepcopy__` method with a
+        nested `copy.deepcopy()` call.
+
+        :return: None
+        """
+        coordinates = np.random.random(2)
+        frame = generate_frame2d(parent=origin2d)
+        position = Position2d(coordinates, frame)
+
+        copy_position = copy.deepcopy(position)
+
+        assert copy_position.reference.parent() == origin2d
 
     def test_find_transform_path(self, frame2d_system):
         """
@@ -748,6 +777,32 @@ class TestRootFrame3d:
                            np.array([0, 0, 0], dtype=np.float64), rtol=RTOL)
         assert np.allclose(frame.rotation.as_matrix(), np.identity(3),
                            rtol=RTOL)
+
+    def test_deepcopy_simple(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame2d.__deepcopy__` method with a
+        simple `copy.deepcopy()` call.
+
+        :return: None
+        """
+        root_frame = RootFrame3d()
+
+        assert copy.deepcopy(root_frame) == root_frame
+
+    def test_deepcopy_nested(self):
+        """
+        Test the :meth:`gtFrame.basic.RootFrame2d.__deepcopy__` method with a
+        nested `copy.deepcopy()` call.
+
+        :return: None
+        """
+        coordinates = np.random.random(3)
+        frame = generate_frame3d(parent=origin3d)
+        position = Position3d(coordinates, frame)
+
+        copy_position = copy.deepcopy(position)
+
+        assert copy_position.reference.parent() == origin3d
 
     def test_find_transform_path(self, frame3d_system):
         """
