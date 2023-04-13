@@ -296,7 +296,7 @@ class TestBoundPosition2d:
 
         result = position.add_direction(direction)
 
-        assert result.reference == position.reference
+        assert np.allclose(position.coordinates, result.coordinates, rtol=RTOL)
         assert result.rtol == position.rtol
 
     def test_add_direction_random(self):
@@ -342,9 +342,10 @@ class TestBoundPosition2d:
             coordinates = position.coordinates
             direction = random_direction2d()
 
-            result = position.add_direction(direction)      # noqa: F841
+            result = position.add_direction(direction)
 
             assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+            assert result != position
 
     def test_apply_direction(self):
         """
@@ -728,7 +729,7 @@ class TestBoundPosition3d:
 
         result = position.add_direction(direction)
 
-        assert result.reference == position.reference
+        assert np.allclose(position.coordinates, result.coordinates, rtol=RTOL)
         assert result.rtol == position.rtol
 
     def test_add_direction_random(self):
@@ -774,9 +775,10 @@ class TestBoundPosition3d:
             coordinates = position.coordinates
             direction = random_direction3d()
 
-            result = position.add_direction(direction)  # noqa: F841
+            result = position.add_direction(direction)
 
             assert np.allclose(position.coordinates, coordinates, rtol=RTOL)
+            assert result != position
 
     def test_apply_direction(self):
         """
