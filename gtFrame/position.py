@@ -11,6 +11,7 @@ Classes:
     * Position3d
 
 """
+import copy
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
@@ -170,8 +171,7 @@ class BoundPosition2d(Position2d):
         :rtype: BoundPosition2d
         """
         rotated = direction.transform_to(self.reference.parent())
-        new = BoundPosition2d(self.coordinates, self.reference,
-                              rtol=self.rtol)
+        new = copy.deepcopy(self)
         new.reference.position += rotated
         return new
 
@@ -188,7 +188,7 @@ class BoundPosition2d(Position2d):
         :type direction: gtFrame.direction.Direction2d
         :return: None
         """
-        rotated = direction.transform_to(self.reference)
+        rotated = direction.transform_to(self.reference.parent())
         self.reference.position = self.reference.position + rotated
 
 
@@ -344,8 +344,7 @@ class BoundPosition3d(Position3d):
         :rtype: BoundPosition3d
         """
         rotated = direction.transform_to(self.reference.parent())
-        new = BoundPosition3d(self.coordinates, self.reference,
-                              rtol=self.rtol)
+        new = copy.deepcopy(self)
         new.reference.position += rotated
         return new
 
@@ -362,5 +361,5 @@ class BoundPosition3d(Position3d):
         :type direction: gtFrame.direction.Direction3d
         :return: None
         """
-        rotated = direction.transform_to(self.reference)
+        rotated = direction.transform_to(self.reference.parent())
         self.reference.position = self.reference.position + rotated
