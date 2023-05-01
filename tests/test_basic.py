@@ -422,6 +422,25 @@ class TestFrame2d:
         assert path4 == expected4
         assert path5 == expected5
 
+    def test_find_transform_path_separate(self):
+        """
+        Test the :meth:`gtFrame.basic.Frame2d.find_transform_path` method by
+        testing with two separate origin objects.
+        """
+        position = np.zeros(2)
+        rotation = Rotation2d(0)
+
+        origin_a = RootFrame2d()
+        origin_b = RootFrame2d()
+        frame_a = Frame2d(position, rotation, parent_frame=origin_a)
+        frame_b = Frame2d(position, rotation, parent_frame=origin_b)
+
+        expected = [(frame_a, 'to'), (frame_b, 'from')]
+
+        path = frame_a.find_transform_path(frame_b)
+
+        assert path == expected
+
     def test_parent(self, random_frame2d):
         """
         Test the .parent method.
@@ -1012,6 +1031,25 @@ class TestFrame3d:
         assert path3 == expected3
         assert path4 == expected4
         assert path5 == expected5
+
+    def test_find_transform_path_separate(self):
+        """
+        Test the :meth:`gtFrame.basic.Frame2d.find_transform_path` method by
+        testing with two separate origin objects.
+        """
+        position = np.zeros(3)
+        rotation = Rotation3d.from_rotvec(np.zeros(3))
+
+        origin_a = RootFrame3d()
+        origin_b = RootFrame3d()
+        frame_a = Frame3d(position, rotation, parent_frame=origin_a)
+        frame_b = Frame3d(position, rotation, parent_frame=origin_b)
+
+        expected = [(frame_a, 'to'), (frame_b, 'from')]
+
+        path = frame_a.find_transform_path(frame_b)
+
+        assert path == expected
 
     def test_parent(self, random_frame3d):
         """

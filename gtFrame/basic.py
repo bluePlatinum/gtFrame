@@ -202,7 +202,7 @@ class Frame2d:
         self_to_origin = list()
         current_frame = self
 
-        while current_frame != origin2d:
+        while not isinstance(current_frame, RootFrame2d):
 
             # check if desired frame is in the branch
             if current_frame == frame:
@@ -216,7 +216,7 @@ class Frame2d:
         frame_to_origin = list()
         current_frame = frame
 
-        while current_frame != origin2d:
+        while not isinstance(current_frame, RootFrame2d):
 
             # check if self frame is on the branch of frame
             if current_frame == self:
@@ -527,7 +527,7 @@ class Frame3d:
         self_to_origin = list()
         current_frame = self
 
-        while current_frame != origin3d:
+        while not isinstance(current_frame, RootFrame3d):
 
             # check if desired frame is in the branch
             if current_frame == frame:
@@ -541,7 +541,7 @@ class Frame3d:
         frame_to_origin = list()
         current_frame = frame
 
-        while current_frame != origin3d:
+        while not isinstance(current_frame, RootFrame3d):
 
             # check if self frame is on the branch of frame
             if current_frame == self:
