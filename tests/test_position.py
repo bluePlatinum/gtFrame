@@ -255,6 +255,12 @@ class TestBoundPosition2d:
 
         assert position_a == position_b
 
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert BoundPosition2d.__str__ is not origin2d.__str__
+
     def test_add_direction_static(self):
         """
         Tests the .add_direction method with static testcases. This test
@@ -423,6 +429,12 @@ class TestPosition2d:
                                 frame_b)
 
         assert position_a == position_b
+
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert Position2d.__str__ is not object.__str__
 
     def test_add_direction_static(self):
         """
@@ -686,6 +698,12 @@ class TestBoundPosition3d:
 
         assert position_a == position_b
 
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert BoundPosition3d.__str__ is not object.__str__
+
     def test_add_direction_static(self):
         """
         Tests the .add_direction method with static testcases. This test
@@ -856,6 +874,12 @@ class TestPosition3d:
                                 frame_b)
 
         assert position_a == position_b
+
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert BoundPosition3d.__str__ is not object.__str__
 
     def test_add_direction_static(self):
         """

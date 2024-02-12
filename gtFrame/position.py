@@ -15,7 +15,7 @@ import copy
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
-from gtFrame.basic import RootFrame2d, RootFrame3d
+from gtFrame.basic import origin2d, origin3d, RootFrame2d, RootFrame3d
 from gtFrame.direction import Direction2d, Direction3d
 
 
@@ -57,6 +57,15 @@ class Position2d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def __str__(self):
+        """
+        Returns a string showing the position in the origin frame.
+
+        :return: a string with information about the object
+        :rtype: str
+        """
+        return f"{str(self.transform_to(origin2d))} (relative to origin2d)"
 
     def add_direction(self, direction):
         """
@@ -230,6 +239,15 @@ class Position3d:
         """
         other = position.transform_to(self.reference)
         return np.allclose(self.coordinates, other, rtol=self.rtol)
+
+    def __str__(self):
+        """
+        Returns a string showing the position in the origin frame.
+
+        :return: a string with information about the object
+        :rtype: str
+        """
+        return f"{str(self.transform_to(origin3d))} (relative to origin3d)"
 
     def add_direction(self, direction):
         """
