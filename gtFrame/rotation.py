@@ -31,6 +31,15 @@ class Rotation2d:
             [math.cos(self._angle), - math.sin(self._angle)],
             [math.sin(self._angle), math.cos(self._angle)]], dtype=np.float64)
 
+    def __str__(self):
+        """
+        Displays the class name along with the rotation angle in degrees.
+
+        :return: a string representation of the object
+        :rtype: str
+        """
+        return f"2D Rotation with {self._angle * (180 / math.pi)}"
+
     def apply(self, vector):
         """
         Apply the rotation to a given 2d-vector.

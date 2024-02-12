@@ -232,6 +232,14 @@ class TestRotation2d:
         assert rot_0_a.is_close(rot_0_b, rtol=tested_rtol)
         assert not rot_1_a.is_close(rot_1_b, rtol=tested_rtol)
 
+    def test_str_implemented(self):
+        """
+        Test whether a custom __str__ method is implemented.
+
+        :return: None
+        """
+        assert Rotation2d.__str__ is not object.__str__
+
     def test_update(self):
         """
         Test the update method with random values.
