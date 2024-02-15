@@ -17,7 +17,7 @@ import copy
 import numpy as np
 
 from gtFrame import DEFAULT_RTOL
-from gtFrame.basic import Frame2d, Frame3d
+from gtFrame.basic import Frame2d, Frame3d, origin2d, origin3d
 
 
 class Direction2d:
@@ -102,6 +102,15 @@ class Direction2d:
                             "with a number.")
 
         return Direction2d(self.vector * factor, self.reference, self.rtol)
+
+    def __str__(self):
+        """
+        Returns a string representing the direction in the origin frame.
+
+        :return: a string with information about the direction object
+        :rtype: str
+        """
+        return f"{str(self.transform_to(origin2d))} (relative to origin2d)"
 
     def apply_direction(self, direction):
         """
@@ -239,6 +248,16 @@ class Direction3d:
                             "with a number.")
 
         return Direction3d(self.vector * factor, self.reference, self.rtol)
+
+    def __str__(self):
+        """
+        Returns a string representing the direction object relative to the
+        origin3d frame.
+
+        :return: a string with information about the direction object
+        :rtype: str
+        """
+        return f"{str(self.transform_to(origin3d))} (relative to origin3d)"
 
     def apply_direction(self, direction):
         """

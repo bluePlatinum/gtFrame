@@ -218,6 +218,12 @@ class TestDirection2d:
         with pytest.raises(ValueError):
             direction * inv_2
 
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert Direction2d.__str__ is not object.__str__
+
     def test_apply_direction_static(self):
         """
         Tests the :meth:`gtFrame.direction.Direction2d.apply_direction` method
@@ -551,6 +557,12 @@ class TestDirection3d:
 
         with pytest.raises(ValueError):
             direction * inv_2
+
+    def test_str_implemented(self):
+        """
+        Test if a custom __str__ method is implemented.
+        """
+        assert Direction3d.__str__ is not object.__str__
 
     def test_apply_direction_static(self):
         """
